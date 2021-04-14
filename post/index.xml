@@ -17,6 +17,15 @@
     </item>
     
     <item>
+      <title>Text Mining</title>
+      <link>https://networkingarchives.github.io/blog/2021/04/14/text-mining/</link>
+      <pubDate>Wed, 14 Apr 2021 00:00:00 +0000</pubDate>
+      
+      <guid>https://networkingarchives.github.io/blog/2021/04/14/text-mining/</guid>
+      <description>Calendars of State Papers and Networking Archives Most of the Networking Archives project has been using the metadata, or data about, the digitised correspondence from the State Papers Online. Metadata in this sense means everything except the content of the letters: including author names, recipient names, date, place of sending and so on, in the research of seventeenth-century intelligencing. Gale State Papers Online brings together a number of historical primary sources, connecting the original manuscript images from the State Papers with the ‘Calendars of State Papers’, a printed resource.</description>
+    </item>
+    
+    <item>
       <title>Word Vectors</title>
       <link>https://networkingarchives.github.io/blog/2021/04/14/word-vectors/</link>
       <pubDate>Wed, 14 Apr 2021 00:00:00 +0000</pubDate>
