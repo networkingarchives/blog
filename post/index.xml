@@ -17,6 +17,15 @@
     </item>
     
     <item>
+      <title>Representing Calendars of State Papers with Word Vectors</title>
+      <link>https://networkingarchives.github.io/blog/2021/04/14/representing-calendars-of-state-papers-with-word-vectors/</link>
+      <pubDate>Wed, 14 Apr 2021 00:00:00 +0000</pubDate>
+      
+      <guid>https://networkingarchives.github.io/blog/2021/04/14/representing-calendars-of-state-papers-with-word-vectors/</guid>
+      <description>Text and Models Digital Humanities is often concerned with creating models of text: a general name for a kind of representation of text which makes it in some way easier to interpret. TEI-encoded text is an example of a model: we take the raw material of a text document and add elements to it to make it easier to work with and analyse.</description>
+    </item>
+    
+    <item>
       <title>Text Mining</title>
       <link>https://networkingarchives.github.io/blog/2021/04/14/text-mining/</link>
       <pubDate>Wed, 14 Apr 2021 00:00:00 +0000</pubDate>
