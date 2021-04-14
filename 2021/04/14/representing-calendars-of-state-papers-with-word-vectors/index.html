@@ -86,11 +86,12 @@
 
 <div id="text-and-models" class="section level3">
 <h3>Text and Models</h3>
-<p>Digital Humanities is <a href="https://doi.org/10.1093/llc/fqw045">often concerned</a> with creating <em>models</em> of text: a general name for a kind of representation of text which makes it in some way easier to interpret. TEI-encoded text is an example of a model: we take the raw material of a text document and add elements to it to make it easier to work with and analyse. Models are often further abstracted from the original text. One way we can represent text in a way that a machine can interpret is with a <em>word vector.</em> A word vector is simply a numerical representation of a word within a corpus (a body of text, often a series of documents), usually consisting of a series of numbers in a specified sequence. This type of representation is used for a variety of Natural Language Processing tasks - for instance measuring the similarity between two documents. This post uses a couple of R packages and a method for creating word vectors with a neural net, called <a href="https://nlp.stanford.edu/projects/glove/">GloVe</a>, to produce a series of vectors which give useful clues as to the semantic links between words in a corpus. The method is then used to analyse the printed summaries of the English State Papers, from <a href="https://www.gale.com/primary-sources/state-papers-online">State Papers Online</a>, and show how they can be used to understand how the association between words and concepts changed over the course of the seventeenth century.</p>
+<p>Many Digital Humanities projects <a href="https://doi.org/10.1093/llc/fqw045">involve</a> constructing <em>models</em> of text: a general name for a kind of representation of text which makes it in some way easier to interpret. TEI-encoded text is an example of a model: we take the ‘raw material’ of a document, its text, and add elements to it to make it easier to work with and analyse. Models are often further abstracted from the original text. One way we can represent text in a way that a machine can interpret is with a <em>word vector.</em> A word vector is simply a numerical representation of a word within a corpus (a body of text, often a series of documents), usually consisting of a series of numbers in a specified sequence. This type of representation is used for a variety of Natural Language Processing tasks - for instance measuring the similarity between two documents.</p>
+<p>This post uses a couple of R packages and a method for creating word vectors with a neural net, called <a href="https://nlp.stanford.edu/projects/glove/">GloVe</a>, to produce a series of vectors which give useful clues as to the semantic links between words in a corpus. The method is then used to analyse the printed summaries of the English State Papers, from <a href="https://www.gale.com/primary-sources/state-papers-online">State Papers Online</a>, and show how they can be used to understand how the association between words and concepts changed over the course of the seventeenth century.</p>
 </div>
 <div id="what-is-a-word-vector-then" class="section level3">
 <h3>What is a Word Vector, Then?</h3>
-<p>Imagine you have two documents in a corpus. One of them is an article about pets, and the other is a piece of fiction about a team of crime fighting animal superheroes. We’ll call them document A and document B. One way to represent the words within these documents as a vector would be to use the counts of each word per document.</p>
+<p>First, I’ll try to briefly explain word vectors. Imagine you have two documents in a corpus. One of them is an article about pets, and the other is a piece of fiction about a team of crime fighting animal superheroes. We’ll call them document A and document B. One way to represent the words within these documents as a vector would be to use the counts of each word per document.</p>
 <p>To do this, you could give each word a set of coordinates, <span class="math inline">\(x\)</span> and <span class="math inline">\(y\)</span>, where <span class="math inline">\(x\)</span> is a count of how many times the word appears in document A and <span class="math inline">\(y\)</span> the number of times it appears in document B.</p>
 <p>The first step is to make a dataframe with the relevant counts:</p>
 <pre class="r"><code>library(ggrepel)
@@ -158,9 +159,9 @@ euc.dist(pointA, pointB)</code></pre>
 <p>Just like the plot above, we can plot the words in three dimensions, using <a href="https://plotly.com/r/">Plotly</a>:</p>
 <pre class="r"><code>library(plotly)
 
-plot_ly(data = word_vectors_3d, x =  ~x, y = ~y,z =  ~z, text = ~word) %&gt;% add_markers()</code></pre>
+plot_ly(data = word_vectors_3d, x =  ~x, y = ~y,z =  ~z, text = ~word) %&gt;% add_markers() %&gt;% layout(title = &quot;3D Representation of Word Vectors&quot;)</code></pre>
 <div id="htmlwidget-1" style="width:672px;height:480px;" class="plotly html-widget"></div>
-<script type="application/json" data-for="htmlwidget-1">{"x":{"visdat":{"20a871e780a9":["function () ","plotlyVisDat"]},"cur_data":"20a871e780a9","attrs":{"20a871e780a9":{"x":{},"y":{},"z":{},"text":{},"alpha_stroke":1,"sizes":[10,100],"spans":[1,20],"type":"scatter3d","mode":"markers","inherit":true}},"layout":{"margin":{"b":40,"l":60,"t":25,"r":10},"scene":{"xaxis":{"title":"x"},"yaxis":{"title":"y"},"zaxis":{"title":"z"}},"hovermode":"closest","showlegend":false},"source":"A","config":{"showSendToCloud":false},"data":[{"x":[10,8,6,5,6,5,2,1],"y":[0,1,3,5,8,8,10,9],"z":[1,3,5,2,7,8,4,3],"text":["crufts","feed","cat","dog","mouse","rabbit","cape","hero"],"type":"scatter3d","mode":"markers","marker":{"color":"rgba(31,119,180,1)","line":{"color":"rgba(31,119,180,1)"}},"error_y":{"color":"rgba(31,119,180,1)"},"error_x":{"color":"rgba(31,119,180,1)"},"line":{"color":"rgba(31,119,180,1)"},"frame":null}],"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.2,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
+<script type="application/json" data-for="htmlwidget-1">{"x":{"visdat":{"316d4b74dfba":["function () ","plotlyVisDat"]},"cur_data":"316d4b74dfba","attrs":{"316d4b74dfba":{"x":{},"y":{},"z":{},"text":{},"alpha_stroke":1,"sizes":[10,100],"spans":[1,20],"type":"scatter3d","mode":"markers","inherit":true}},"layout":{"margin":{"b":40,"l":60,"t":25,"r":10},"title":"3D Representation of Word Vectors","scene":{"xaxis":{"title":"x"},"yaxis":{"title":"y"},"zaxis":{"title":"z"}},"hovermode":"closest","showlegend":false},"source":"A","config":{"showSendToCloud":false},"data":[{"x":[10,8,6,5,6,5,2,1],"y":[0,1,3,5,8,8,10,9],"z":[1,3,5,2,7,8,4,3],"text":["crufts","feed","cat","dog","mouse","rabbit","cape","hero"],"type":"scatter3d","mode":"markers","marker":{"color":"rgba(31,119,180,1)","line":{"color":"rgba(31,119,180,1)"}},"error_y":{"color":"rgba(31,119,180,1)"},"error_x":{"color":"rgba(31,119,180,1)"},"line":{"color":"rgba(31,119,180,1)"},"frame":null}],"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.2,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
 <p>You can start to understand how the words now cluster together in the 3D plot: rabbit and mouse are clustered together, but now in the third dimension they are further away from dog. We can use the same formula as above to calculate these distances, just by adding the z coordinates to the pointA and pointB vectors:</p>
 <pre class="r"><code>pointA = c(word_vectors$x[word_vectors$word == &#39;dog&#39;], word_vectors$y[word_vectors$word == &#39;dog&#39;], word_vectors$z[word_vectors$word == &#39;dog&#39;])</code></pre>
 <pre><code>## Warning: Unknown or uninitialised column: `z`.</code></pre>
@@ -290,26 +291,26 @@ tcm = create_tcm(it, vectorizer, skip_grams_window = 10)</code></pre>
 <pre class="r"><code>glove = GlobalVectors$new(rank = 100, x_max = 10)
 
 wv_main = glove$fit_transform(tcm, n_iter = 20, convergence_tol = 0.00001)</code></pre>
-<pre><code>## INFO  [16:42:43.919] epoch 1, loss 0.1507 
-## INFO  [16:43:06.777] epoch 2, loss 0.0993 
-## INFO  [16:43:29.689] epoch 3, loss 0.0878 
-## INFO  [16:43:52.531] epoch 4, loss 0.0818 
-## INFO  [16:44:15.333] epoch 5, loss 0.0778 
-## INFO  [16:44:38.210] epoch 6, loss 0.0749 
-## INFO  [16:45:01.067] epoch 7, loss 0.0728 
-## INFO  [16:45:23.902] epoch 8, loss 0.0710 
-## INFO  [16:45:46.733] epoch 9, loss 0.0696 
-## INFO  [16:46:09.581] epoch 10, loss 0.0685 
-## INFO  [16:46:32.315] epoch 11, loss 0.0675 
-## INFO  [16:46:55.152] epoch 12, loss 0.0666 
-## INFO  [16:47:18.101] epoch 13, loss 0.0659 
-## INFO  [16:47:41.010] epoch 14, loss 0.0652 
-## INFO  [16:48:03.908] epoch 15, loss 0.0647 
-## INFO  [16:48:26.754] epoch 16, loss 0.0642 
-## INFO  [16:48:49.493] epoch 17, loss 0.0637 
-## INFO  [16:49:12.302] epoch 18, loss 0.0633 
-## INFO  [16:49:35.441] epoch 19, loss 0.0629 
-## INFO  [16:49:58.840] epoch 20, loss 0.0626</code></pre>
+<pre><code>## INFO  [17:31:09.701] epoch 1, loss 0.1509 
+## INFO  [17:31:32.348] epoch 2, loss 0.0992 
+## INFO  [17:31:54.901] epoch 3, loss 0.0878 
+## INFO  [17:32:17.499] epoch 4, loss 0.0817 
+## INFO  [17:32:40.086] epoch 5, loss 0.0778 
+## INFO  [17:33:02.747] epoch 6, loss 0.0749 
+## INFO  [17:33:25.273] epoch 7, loss 0.0727 
+## INFO  [17:33:47.849] epoch 8, loss 0.0710 
+## INFO  [17:34:10.401] epoch 9, loss 0.0696 
+## INFO  [17:34:32.963] epoch 10, loss 0.0685 
+## INFO  [17:34:55.542] epoch 11, loss 0.0675 
+## INFO  [17:35:18.195] epoch 12, loss 0.0666 
+## INFO  [17:35:40.787] epoch 13, loss 0.0659 
+## INFO  [17:36:03.466] epoch 14, loss 0.0652 
+## INFO  [17:36:26.088] epoch 15, loss 0.0647 
+## INFO  [17:36:48.649] epoch 16, loss 0.0642 
+## INFO  [17:37:11.207] epoch 17, loss 0.0637 
+## INFO  [17:37:33.857] epoch 18, loss 0.0633 
+## INFO  [17:37:56.621] epoch 19, loss 0.0629 
+## INFO  [17:38:19.129] epoch 20, loss 0.0626</code></pre>
 <p>GloVe results in two sets of word vectors. The authors of the GloVe package suggest that combining both results in higher-quality embeddings:</p>
 <pre class="r"><code>wv_context = glove$components
 
@@ -334,50 +335,46 @@ head(sort(cos_sim[,1], decreasing = TRUE), 20)
 }</code></pre>
 <p>The function takes a single word as an argument and returns the twenty closest word vectors, by cosine distance. What are the closest in useage to ‘king’?</p>
 <pre class="r"><code>ten_closest_words(&#39;king&#39;)</code></pre>
-<pre><code>##      king    king&#39;s   majesty     queen majesty&#39;s    please      duke   england 
-## 1.0000000 0.8212048 0.8138705 0.7645907 0.7129423 0.7117103 0.7070675 0.6989618 
-##       seq    prince      late      lord       cpg        id   declare   promise 
-## 0.6968938 0.6957717 0.6892410 0.6886927 0.6775515 0.6728083 0.6707386 0.6706064 
-##     grant        pg    intend    favour 
-## 0.6702634 0.6683128 0.6673157 0.6669322</code></pre>
+<pre><code>##      king   majesty    king&#39;s     queen      late majesty&#39;s       seq    prince 
+## 1.0000000 0.8124185 0.8115906 0.7544641 0.7394790 0.7276555 0.7186679 0.7103045 
+##    please   england       cpg      duke        id        pg   promise     grant 
+## 0.7099343 0.7034877 0.6939898 0.6939041 0.6891967 0.6883882 0.6882395 0.6853770 
+##   declare      lord      time      pray 
+## 0.6852612 0.6807144 0.6745944 0.6742028</code></pre>
 <p>Unsurprisingly, a word that is often interchangeable with King, Majesty, is the closest, followed by ‘Queen’ - also obviously interchangeable with King, depending on the circumstances.</p>
 <p>Word embeddings are often used to understand different and changing <a href="https://lab.kb.nl/about-us/blog/introduction-gender-bias-historical-newspapers">gender representations</a>. How are gendered words represented in the State Papers abstracts? First of all, wife:</p>
 <pre class="r"><code>ten_closest_words(&#39;wife&#39;)</code></pre>
-<pre><code>##      wife   husband     child    sister   brother    mother  daughter     marry 
-## 1.0000000 0.8052452 0.7698357 0.7667895 0.7508403 0.7370936 0.7030940 0.6960363 
-##      lady    father       son    family     widow    wife&#39;s  writer&#39;s    friend 
-## 0.6945475 0.6880079 0.6724890 0.6577536 0.6534386 0.6433571 0.6267130 0.6107286 
-##   servant      life     woman     uncle 
-## 0.6067618 0.6038536 0.5888316 0.5884820</code></pre>
+<pre><code>##      wife   husband     child    sister    mother      lady   brother  daughter 
+## 1.0000000 0.8191674 0.7883127 0.7646102 0.7566901 0.7429047 0.7282066 0.7235836 
+##       son     marry    father     widow    family     woman  writer&#39;s    friend 
+## 0.6976267 0.6896181 0.6853372 0.6558982 0.6178040 0.6116087 0.6066610 0.6059600 
+##      life   servant    wife&#39;s     uncle 
+## 0.5971647 0.5971094 0.5952873 0.5922310</code></pre>
 <p>Unsurprisingly wife is most similar to other words relating to family. What about husband?</p>
 <pre class="r"><code>ten_closest_words(&#39;husband&#39;)</code></pre>
-<pre><code>##      husband         wife        child        widow     daughter      servant 
-##    1.0000000    0.8052452    0.7165223    0.6532990    0.6261413    0.5965272 
-##       father       sister        marry      brother         lady          son 
-##    0.5944257    0.5908197    0.5896171    0.5895353    0.5876528    0.5852841 
-##       family          die        woman     petition    husband&#39;s         debt 
-##    0.5834663    0.5770542    0.5749239    0.5720199    0.5704290    0.5675137 
-##       mother petitioner&#39;s 
-##    0.5606422    0.5540846</code></pre>
+<pre><code>##   husband      wife     child     widow    mother    sister  daughter   brother 
+## 1.0000000 0.8191674 0.7370158 0.6531169 0.6276656 0.6243364 0.6201605 0.6070677 
+##    family     marry    father      lady       son   servant     woman       die 
+## 0.6062919 0.5999262 0.5989705 0.5983755 0.5849611 0.5637674 0.5615799 0.5615049 
+##  prisoner  petition      debt husband&#39;s 
+## 0.5565017 0.5536114 0.5517856 0.5496583</code></pre>
 <p>Husband is mostly similar but with some interesting different associations: ‘widow’, ‘die’, ‘petition’, ‘debt’, and ‘prisoner’, reflecting the fact that there is a large group of petitions in the State Papers written by women looking for pardons or clemency for their husbands, particularly following the Monmouth Rebellion in 1683.</p>
 <p>Looking at the closest words to place names gives some interesting associations. Amsterdam is associated with terms related to shipping and trade:</p>
 <pre class="r"><code>ten_closest_words(&#39;amsterdam&#39;)</code></pre>
-<pre><code>##   amsterdam   rotterdam        lade    bordeaux     holland     hamburg 
-##   1.0000000   0.7820016   0.6321423   0.6090476   0.5810914   0.5732227 
-##       texel     zealand       flush      richly      vessel       dutch 
-##   0.5654508   0.5649139   0.5562380   0.5540978   0.5514581   0.5449640 
-##      ostend    merchant     english        ship       prize     dunkirk 
-##   0.5401786   0.5342933   0.5285906   0.5240107   0.5204601   0.5162033 
-##      london merchantmen 
-##   0.5141761   0.5135909</code></pre>
+<pre><code>## amsterdam rotterdam      lade  bordeaux   hamburg   holland    richly     dutch 
+## 1.0000000 0.7252002 0.6393961 0.5937090 0.5631972 0.5539730 0.5471240 0.5428466 
+##  merchant     texel     prize    vessel  dutchman    arrive   zealand     flush 
+## 0.5420471 0.5295916 0.5276372 0.5258728 0.5229681 0.5200589 0.5122757 0.5090996 
+##    london    french  rochelle    nantes 
+## 0.5088864 0.5063027 0.5030953 0.5019438</code></pre>
 <p>Whereas Rome is very much associated with religion and ecclesiastical politics:</p>
 <pre class="r"><code>ten_closest_words(&#39;rome&#39;)</code></pre>
-<pre><code>##       rome       pope     jesuit      spain     naples      friar   catholic 
-##  1.0000000  0.6440697  0.5944330  0.5353647  0.5243311  0.5153789  0.5128589 
-##     priest     nuncio   cardinal     venice      italy     pope&#39;s      paris 
-##  0.5069620  0.5047670  0.5046717  0.5018490  0.4804685  0.4650343  0.4611425 
-##   religion   florence     tyrone    germany ambassador       mass 
-##  0.4609302  0.4586808  0.4502158  0.4409780  0.4307108  0.4255171</code></pre>
+<pre><code>##       rome       pope     jesuit     priest      friar     nuncio   cardinal 
+##  1.0000000  0.6357303  0.6291777  0.5639153  0.5457535  0.5339667  0.5221153 
+##      spain     naples   florence   catholic     venice      paris     pope&#39;s 
+##  0.5080164  0.5063024  0.5036499  0.4967918  0.4937650  0.4878270  0.4822044 
+##   religion ambassador      italy     tyrone    shortly     depart 
+##  0.4794766  0.4543575  0.4483097  0.4387691  0.4326920  0.4322462</code></pre>
 </div>
 <div id="more-complex-vector-tasks" class="section level4">
 <h4>More Complex Vector Tasks</h4>
@@ -388,14 +385,14 @@ head(sort(cos_sim[,1], decreasing = TRUE), 20)
 cos_sim_test = sim2(x = word_vectors, y = sum, method = &quot;cosine&quot;, norm = &quot;l2&quot;)
 
 head(sort(cos_sim_test[,1], decreasing = T), 20)</code></pre>
-<pre><code>##        manus         girl      bolster        broth    overvalue       chimay 
-##    0.5358662    0.5002595    0.4787582    0.4748580    0.4590480    0.4545143 
-##       relade      swarton    dicconson        agone         oaze   coarseness 
-##    0.4522462    0.4307659    0.4270668    0.4255704    0.4248741    0.4211055 
-## pestilential   arabella&#39;s  reciprocate     vanquish     gratwick       mortis 
-##    0.4206081    0.4185316    0.4176806    0.4173345    0.4140675    0.4135392 
-##      cockran       godden 
-##    0.4109165    0.4105460</code></pre>
+<pre><code>##  coarseness  relievable       broth         owl rushworth&#39;s    cloathes 
+##   0.4678656   0.4617825   0.4562565   0.4521938   0.4521481   0.4512532 
+##         gad      slatch    fosterer    hurley&#39;s   o&#39;neile&#39;s       sluis 
+##   0.4503194   0.4450165   0.4438963   0.4266353   0.4259293   0.4214021 
+##    plowland   innsbruck   uncharged  pardonable    milander    vanquish 
+##   0.4212738   0.4172199   0.4164849   0.4155880   0.4155654   0.4153549 
+##     caliver everlasting 
+##   0.4153530   0.4141557</code></pre>
 <p>It is also a way of finding analogies: so, for example, Paris - France + Germany should equal to ‘Berlin’, because Berlin is like the Paris of France. Is that what we get?</p>
 <pre class="r"><code>test = word_vectors[&quot;paris&quot;, , drop = F] -
   word_vectors[&quot;france&quot;, , drop = F] +
@@ -407,10 +404,10 @@ head(sort(cos_sim_test[,1], decreasing = T), 20)</code></pre>
 cos_sim_test = sim2(x = word_vectors, y = test, method = &quot;cosine&quot;, norm = &quot;l2&quot;)
 
 head(sort(cos_sim_test[,1], decreasing = T), 10)</code></pre>
-<pre><code>##   germany     paris  brussels frankfort       n.s     style        ps   edmonds 
-## 0.6102523 0.6030384 0.5324926 0.4870450 0.4865735 0.4542244 0.4386526 0.4342144 
-##   safirov     hague 
-## 0.4315257 0.4278840</code></pre>
+<pre><code>##     paris   germany       n.s  brussels frankfort     stilo tuesday&#39;s        ps 
+## 0.6346836 0.6185004 0.4993398 0.4934119 0.4434699 0.4323685 0.4251119 0.4249966 
+##    veteri   edmonds 
+## 0.4216843 0.4046615</code></pre>
 <p>After Germany and Paris, the most similar to Paris - France + Germany is Brussels: not the correct answer, but a close enough guess!</p>
 <p>We can try other analogies: pen - letter + book should in theory give some word related to printing and book production such as print, or press, or maybe type (Think pen is to letter as X is to book).</p>
 <pre class="r"><code>test = word_vectors[&quot;pen&quot;, , drop = F] -
@@ -420,14 +417,14 @@ head(sort(cos_sim_test[,1], decreasing = T), 10)</code></pre>
 cos_sim_test = sim2(x = word_vectors, y = test, method = &quot;cosine&quot;, norm = &quot;l2&quot;)
 
 head(sort(cos_sim_test[,1], decreasing = T), 20)</code></pre>
-<pre><code>##           pen          book      wivell&#39;s    manuscript storekeeper&#39;s 
-##     0.5675698     0.5375201     0.4924819     0.4810773     0.4778991 
-##         bible        weapon       library        broach       printer 
-##     0.4663035     0.4590843     0.4562765     0.4511962     0.4364468 
-##       kitchin        stitch     catalogue           ink      pamphlet 
-##     0.4333470     0.4299980     0.4298250     0.4287475     0.4262377 
-##     bywater&#39;s promiscuously          beam     testament       writing 
-##     0.4242245     0.4223254     0.4183070     0.4124714     0.4061539</code></pre>
+<pre><code>##           pen          book storekeeper&#39;s     bywater&#39;s        stitch 
+##     0.5621649     0.5316695     0.5074405     0.4820687     0.4793163 
+##         bible      pamphlet           ink     catalogue    manuscript 
+##     0.4668026     0.4600276     0.4530105     0.4523773     0.4491164 
+##    unlicensed       library     catechize        shalbe        closet 
+##     0.4451364     0.4402602     0.4337235     0.4242770     0.4210233 
+##        weapon     testament       history        broach        symbol 
+##     0.4191993     0.4178388     0.4165598     0.4140450     0.4105902</code></pre>
 <p>Not bad - printer is in the top 20! The closest is ink, plus some other book-production-related words like stitch, ream, and pamphlet. Though some of these words can also be associated with manuscript production, we <em>could</em> be generous and say that they are sort of to a book as a pen is to a letter!</p>
 </div>
 <div id="change-in-semantic-relations-over-time" class="section level4">
@@ -518,26 +515,26 @@ james_i_tcm = create_tcm(it, vectorizer, skip_grams_window = 10)
 james_i_glove = GlobalVectors$new(rank = 100, x_max = 10)
 
 james_i_wv_main = james_i_glove$fit_transform(james_i_tcm, n_iter = 20, convergence_tol = 0.00001)</code></pre>
-<pre><code>## INFO  [16:50:27.821] epoch 1, loss 0.1526 
-## INFO  [16:50:33.456] epoch 2, loss 0.0921 
-## INFO  [16:50:39.113] epoch 3, loss 0.0784 
-## INFO  [16:50:44.757] epoch 4, loss 0.0712 
-## INFO  [16:50:50.416] epoch 5, loss 0.0664 
-## INFO  [16:50:56.049] epoch 6, loss 0.0629 
-## INFO  [16:51:01.695] epoch 7, loss 0.0603 
-## INFO  [16:51:07.317] epoch 8, loss 0.0582 
-## INFO  [16:51:12.937] epoch 9, loss 0.0565 
-## INFO  [16:51:18.530] epoch 10, loss 0.0551 
-## INFO  [16:51:24.128] epoch 11, loss 0.0538 
-## INFO  [16:51:29.731] epoch 12, loss 0.0528 
-## INFO  [16:51:35.340] epoch 13, loss 0.0519 
-## INFO  [16:51:40.938] epoch 14, loss 0.0511 
-## INFO  [16:51:46.576] epoch 15, loss 0.0504 
-## INFO  [16:51:52.235] epoch 16, loss 0.0498 
-## INFO  [16:51:57.868] epoch 17, loss 0.0492 
-## INFO  [16:52:03.516] epoch 18, loss 0.0487 
-## INFO  [16:52:09.170] epoch 19, loss 0.0482 
-## INFO  [16:52:14.816] epoch 20, loss 0.0478</code></pre>
+<pre><code>## INFO  [17:16:31.689] epoch 1, loss 0.1524 
+## INFO  [17:16:37.300] epoch 2, loss 0.0920 
+## INFO  [17:16:42.907] epoch 3, loss 0.0784 
+## INFO  [17:16:48.506] epoch 4, loss 0.0712 
+## INFO  [17:16:54.110] epoch 5, loss 0.0665 
+## INFO  [17:16:59.755] epoch 6, loss 0.0630 
+## INFO  [17:17:05.392] epoch 7, loss 0.0604 
+## INFO  [17:17:11.069] epoch 8, loss 0.0583 
+## INFO  [17:17:16.950] epoch 9, loss 0.0566 
+## INFO  [17:17:22.686] epoch 10, loss 0.0551 
+## INFO  [17:17:28.362] epoch 11, loss 0.0539 
+## INFO  [17:17:34.040] epoch 12, loss 0.0529 
+## INFO  [17:17:39.680] epoch 13, loss 0.0519 
+## INFO  [17:17:45.334] epoch 14, loss 0.0511 
+## INFO  [17:17:51.052] epoch 15, loss 0.0504 
+## INFO  [17:17:56.712] epoch 16, loss 0.0498 
+## INFO  [17:18:02.732] epoch 17, loss 0.0492 
+## INFO  [17:18:08.533] epoch 18, loss 0.0487 
+## INFO  [17:18:14.293] epoch 19, loss 0.0482 
+## INFO  [17:18:19.948] epoch 20, loss 0.0478</code></pre>
 <pre class="r"><code>james_i_wv_context = james_i_glove$components
 
 james_i_word_vectors = james_i_wv_main + t(james_i_wv_context)</code></pre>
@@ -554,26 +551,26 @@ charles_i_tcm = create_tcm(it, vectorizer, skip_grams_window = 10)
 charles_i_glove = GlobalVectors$new(rank = 100, x_max = 10)
 
 charles_i_wv_main = charles_i_glove$fit_transform(charles_i_tcm, n_iter = 20, convergence_tol = 0.00001)</code></pre>
-<pre><code>## INFO  [16:52:30.139] epoch 1, loss 0.1506 
-## INFO  [16:52:36.981] epoch 2, loss 0.0916 
-## INFO  [16:52:43.813] epoch 3, loss 0.0788 
-## INFO  [16:52:50.632] epoch 4, loss 0.0721 
-## INFO  [16:52:57.474] epoch 5, loss 0.0676 
-## INFO  [16:53:04.369] epoch 6, loss 0.0643 
-## INFO  [16:53:11.211] epoch 7, loss 0.0618 
-## INFO  [16:53:18.042] epoch 8, loss 0.0598 
-## INFO  [16:53:24.899] epoch 9, loss 0.0582 
-## INFO  [16:53:31.745] epoch 10, loss 0.0568 
-## INFO  [16:53:38.597] epoch 11, loss 0.0556 
-## INFO  [16:53:45.439] epoch 12, loss 0.0546 
-## INFO  [16:53:52.280] epoch 13, loss 0.0537 
-## INFO  [16:53:59.099] epoch 14, loss 0.0530 
-## INFO  [16:54:06.046] epoch 15, loss 0.0523 
-## INFO  [16:54:12.869] epoch 16, loss 0.0517 
-## INFO  [16:54:19.744] epoch 17, loss 0.0511 
-## INFO  [16:54:26.628] epoch 18, loss 0.0507 
-## INFO  [16:54:33.480] epoch 19, loss 0.0502 
-## INFO  [16:54:40.252] epoch 20, loss 0.0498</code></pre>
+<pre><code>## INFO  [17:18:43.547] epoch 1, loss 0.1507 
+## INFO  [17:18:50.483] epoch 2, loss 0.0917 
+## INFO  [17:18:57.431] epoch 3, loss 0.0789 
+## INFO  [17:19:04.382] epoch 4, loss 0.0721 
+## INFO  [17:19:11.262] epoch 5, loss 0.0676 
+## INFO  [17:19:18.212] epoch 6, loss 0.0644 
+## INFO  [17:19:25.123] epoch 7, loss 0.0619 
+## INFO  [17:19:31.998] epoch 8, loss 0.0599 
+## INFO  [17:19:38.897] epoch 9, loss 0.0582 
+## INFO  [17:19:45.768] epoch 10, loss 0.0568 
+## INFO  [17:19:52.638] epoch 11, loss 0.0557 
+## INFO  [17:19:59.501] epoch 12, loss 0.0547 
+## INFO  [17:20:06.383] epoch 13, loss 0.0538 
+## INFO  [17:20:13.262] epoch 14, loss 0.0530 
+## INFO  [17:20:20.135] epoch 15, loss 0.0523 
+## INFO  [17:20:26.979] epoch 16, loss 0.0517 
+## INFO  [17:20:33.833] epoch 17, loss 0.0512 
+## INFO  [17:20:40.679] epoch 18, loss 0.0507 
+## INFO  [17:20:47.559] epoch 19, loss 0.0502 
+## INFO  [17:20:54.457] epoch 20, loss 0.0498</code></pre>
 <pre class="r"><code>charles_i_wv_context = charles_i_glove$components
 
 charles_i_word_vectors = charles_i_wv_main + t(charles_i_wv_context)</code></pre>
@@ -590,26 +587,26 @@ commonwealth_tcm = create_tcm(it, vectorizer, skip_grams_window = 10)
 commonwealth_glove = GlobalVectors$new(rank = 100, x_max = 10)
 
 commonwealth_wv_main = commonwealth_glove$fit_transform(commonwealth_tcm, n_iter = 20, convergence_tol = 0.00001)</code></pre>
-<pre><code>## INFO  [16:54:46.783] epoch 1, loss 0.1695 
-## INFO  [16:54:49.807] epoch 2, loss 0.0947 
-## INFO  [16:54:52.831] epoch 3, loss 0.0789 
-## INFO  [16:54:55.859] epoch 4, loss 0.0708 
-## INFO  [16:54:58.875] epoch 5, loss 0.0656 
-## INFO  [16:55:01.906] epoch 6, loss 0.0617 
-## INFO  [16:55:04.948] epoch 7, loss 0.0587 
-## INFO  [16:55:07.980] epoch 8, loss 0.0564 
-## INFO  [16:55:11.011] epoch 9, loss 0.0544 
-## INFO  [16:55:14.013] epoch 10, loss 0.0528 
-## INFO  [16:55:17.030] epoch 11, loss 0.0514 
-## INFO  [16:55:20.047] epoch 12, loss 0.0502 
-## INFO  [16:55:23.071] epoch 13, loss 0.0492 
-## INFO  [16:55:26.091] epoch 14, loss 0.0483 
-## INFO  [16:55:29.160] epoch 15, loss 0.0475 
-## INFO  [16:55:32.357] epoch 16, loss 0.0467 
-## INFO  [16:55:35.473] epoch 17, loss 0.0461 
-## INFO  [16:55:38.540] epoch 18, loss 0.0455 
-## INFO  [16:55:41.649] epoch 19, loss 0.0449 
-## INFO  [16:55:44.715] epoch 20, loss 0.0444</code></pre>
+<pre><code>## INFO  [17:21:11.185] epoch 1, loss 0.1698 
+## INFO  [17:21:14.208] epoch 2, loss 0.0949 
+## INFO  [17:21:17.206] epoch 3, loss 0.0791 
+## INFO  [17:21:20.205] epoch 4, loss 0.0709 
+## INFO  [17:21:23.219] epoch 5, loss 0.0656 
+## INFO  [17:21:26.209] epoch 6, loss 0.0618 
+## INFO  [17:21:29.212] epoch 7, loss 0.0588 
+## INFO  [17:21:32.203] epoch 8, loss 0.0564 
+## INFO  [17:21:35.196] epoch 9, loss 0.0544 
+## INFO  [17:21:38.176] epoch 10, loss 0.0528 
+## INFO  [17:21:41.161] epoch 11, loss 0.0514 
+## INFO  [17:21:44.152] epoch 12, loss 0.0502 
+## INFO  [17:21:47.147] epoch 13, loss 0.0492 
+## INFO  [17:21:50.146] epoch 14, loss 0.0483 
+## INFO  [17:21:53.154] epoch 15, loss 0.0474 
+## INFO  [17:21:56.164] epoch 16, loss 0.0467 
+## INFO  [17:21:59.176] epoch 17, loss 0.0460 
+## INFO  [17:22:02.194] epoch 18, loss 0.0455 
+## INFO  [17:22:05.229] epoch 19, loss 0.0449 
+## INFO  [17:22:08.244] epoch 20, loss 0.0444</code></pre>
 <pre class="r"><code>commonwealth_wv_context = commonwealth_glove$components
 
 # dim(shakes_wv_context)
@@ -630,26 +627,26 @@ charles_ii_tcm = create_tcm(it, vectorizer, skip_grams_window = 10)
 charles_ii_glove = GlobalVectors$new(rank = 100, x_max = 10)
 
 charles_ii_wv_main = charles_ii_glove$fit_transform(charles_ii_tcm, n_iter = 20, convergence_tol = 0.00001)</code></pre>
-<pre><code>## INFO  [16:56:10.730] epoch 1, loss 0.1470 
-## INFO  [16:56:21.336] epoch 2, loss 0.0905 
-## INFO  [16:56:31.801] epoch 3, loss 0.0787 
-## INFO  [16:56:42.293] epoch 4, loss 0.0725 
-## INFO  [16:56:52.977] epoch 5, loss 0.0685 
-## INFO  [16:57:03.521] epoch 6, loss 0.0656 
-## INFO  [16:57:14.045] epoch 7, loss 0.0634 
-## INFO  [16:57:24.648] epoch 8, loss 0.0616 
-## INFO  [16:57:35.186] epoch 9, loss 0.0601 
-## INFO  [16:57:45.706] epoch 10, loss 0.0589 
-## INFO  [16:57:56.198] epoch 11, loss 0.0579 
-## INFO  [16:58:06.689] epoch 12, loss 0.0570 
-## INFO  [16:58:17.182] epoch 13, loss 0.0562 
-## INFO  [16:58:27.652] epoch 14, loss 0.0556 
-## INFO  [16:58:38.076] epoch 15, loss 0.0550 
-## INFO  [16:58:48.588] epoch 16, loss 0.0544 
-## INFO  [16:58:59.559] epoch 17, loss 0.0539 
-## INFO  [16:59:10.077] epoch 18, loss 0.0535 
-## INFO  [16:59:20.596] epoch 19, loss 0.0531 
-## INFO  [16:59:31.142] epoch 20, loss 0.0527</code></pre>
+<pre><code>## INFO  [17:22:37.388] epoch 1, loss 0.1471 
+## INFO  [17:22:47.902] epoch 2, loss 0.0907 
+## INFO  [17:22:58.372] epoch 3, loss 0.0787 
+## INFO  [17:23:08.867] epoch 4, loss 0.0725 
+## INFO  [17:23:19.411] epoch 5, loss 0.0685 
+## INFO  [17:23:29.958] epoch 6, loss 0.0655 
+## INFO  [17:23:40.446] epoch 7, loss 0.0633 
+## INFO  [17:23:50.911] epoch 8, loss 0.0615 
+## INFO  [17:24:01.401] epoch 9, loss 0.0601 
+## INFO  [17:24:11.862] epoch 10, loss 0.0589 
+## INFO  [17:24:22.352] epoch 11, loss 0.0579 
+## INFO  [17:24:33.497] epoch 12, loss 0.0570 
+## INFO  [17:24:44.056] epoch 13, loss 0.0562 
+## INFO  [17:24:54.523] epoch 14, loss 0.0555 
+## INFO  [17:25:05.205] epoch 15, loss 0.0549 
+## INFO  [17:25:15.767] epoch 16, loss 0.0544 
+## INFO  [17:25:26.533] epoch 17, loss 0.0539 
+## INFO  [17:25:37.089] epoch 18, loss 0.0535 
+## INFO  [17:25:47.544] epoch 19, loss 0.0531 
+## INFO  [17:25:57.995] epoch 20, loss 0.0527</code></pre>
 <pre class="r"><code>charles_ii_wv_context = charles_ii_glove$components
 
 # dim(shakes_wv_context)
@@ -670,26 +667,26 @@ james_ii_w_m_ann_tcm = create_tcm(it, vectorizer, skip_grams_window = 10)
 james_ii_w_m_ann_glove = GlobalVectors$new(rank = 100, x_max = 10)
 
 james_ii_w_m_ann_wv_main = james_ii_w_m_ann_glove$fit_transform(james_ii_w_m_ann_tcm, n_iter = 20, convergence_tol = 0.00001)</code></pre>
-<pre><code>## INFO  [16:59:41.622] epoch 1, loss 0.1595 
-## INFO  [16:59:46.255] epoch 2, loss 0.0927 
-## INFO  [16:59:50.891] epoch 3, loss 0.0789 
-## INFO  [16:59:55.552] epoch 4, loss 0.0715 
-## INFO  [17:00:00.218] epoch 5, loss 0.0665 
-## INFO  [17:00:04.860] epoch 6, loss 0.0629 
-## INFO  [17:00:09.514] epoch 7, loss 0.0601 
-## INFO  [17:00:14.128] epoch 8, loss 0.0579 
-## INFO  [17:00:18.759] epoch 9, loss 0.0561 
-## INFO  [17:00:23.382] epoch 10, loss 0.0546 
-## INFO  [17:00:28.003] epoch 11, loss 0.0533 
-## INFO  [17:00:32.636] epoch 12, loss 0.0522 
-## INFO  [17:00:37.283] epoch 13, loss 0.0512 
-## INFO  [17:00:41.935] epoch 14, loss 0.0503 
-## INFO  [17:00:46.585] epoch 15, loss 0.0496 
-## INFO  [17:00:51.232] epoch 16, loss 0.0489 
-## INFO  [17:00:55.896] epoch 17, loss 0.0483 
-## INFO  [17:01:00.538] epoch 18, loss 0.0477 
-## INFO  [17:01:05.163] epoch 19, loss 0.0472 
-## INFO  [17:01:10.030] epoch 20, loss 0.0468</code></pre>
+<pre><code>## INFO  [17:26:22.827] epoch 1, loss 0.1597 
+## INFO  [17:26:27.423] epoch 2, loss 0.0926 
+## INFO  [17:26:32.043] epoch 3, loss 0.0788 
+## INFO  [17:26:36.634] epoch 4, loss 0.0714 
+## INFO  [17:26:41.208] epoch 5, loss 0.0665 
+## INFO  [17:26:45.857] epoch 6, loss 0.0629 
+## INFO  [17:26:50.441] epoch 7, loss 0.0601 
+## INFO  [17:26:55.035] epoch 8, loss 0.0579 
+## INFO  [17:26:59.668] epoch 9, loss 0.0561 
+## INFO  [17:27:04.263] epoch 10, loss 0.0546 
+## INFO  [17:27:08.907] epoch 11, loss 0.0533 
+## INFO  [17:27:13.487] epoch 12, loss 0.0522 
+## INFO  [17:27:18.088] epoch 13, loss 0.0512 
+## INFO  [17:27:22.699] epoch 14, loss 0.0504 
+## INFO  [17:27:27.323] epoch 15, loss 0.0496 
+## INFO  [17:27:31.903] epoch 16, loss 0.0490 
+## INFO  [17:27:36.494] epoch 17, loss 0.0483 
+## INFO  [17:27:41.151] epoch 18, loss 0.0478 
+## INFO  [17:27:45.735] epoch 19, loss 0.0473 
+## INFO  [17:27:50.313] epoch 20, loss 0.0468</code></pre>
 <pre class="r"><code>james_ii_w_m_ann_wv_context = james_ii_w_m_ann_glove$components
 
 # dim(shakes_wv_context)
@@ -767,6 +764,7 @@ head(sort(cos_sim[,1], decreasing = TRUE), 20)
 <p><a href="https://www.wwp.northeastern.edu/outreach/seminars/wem_2019-07/presentations/word_vectors/word_vectors_intro_lecture.xhtml">Good basic introduction to word vectors</a></p>
 <p><a href="https://dhh.uni.lu/2018/12/11/word-embeddings-in-humanities/">Word Embeddings in Humanities</a></p>
 <p><a href="https://lab.kb.nl/about-us/blog/introduction-gender-bias-historical-newspapers">Gender bias in historical newspapers</a></p>
+<p><a href="https://nlp.stanford.edu/projects/histwords/">HistWords:Word Embeddings for Historical Text</a></p>
 </div>
 </div>
 
