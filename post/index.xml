@@ -17,6 +17,15 @@
     </item>
     
     <item>
+      <title>Word Vectors</title>
+      <link>https://networkingarchives.github.io/blog/2021/04/14/word-vectors/</link>
+      <pubDate>Wed, 14 Apr 2021 00:00:00 +0000</pubDate>
+      
+      <guid>https://networkingarchives.github.io/blog/2021/04/14/word-vectors/</guid>
+      <description>One way we can represent text in a way that a machine can interpret is with a word vector. A word vector is simply a numerical representation of a word within a corpus (a body of text, often a series of documents), usually consisting of a series of numbers in a specified sequence. This type of representation is used for a variety of Natural Language Processing tasks - for instance measuring the similarity between two documents.</description>
+    </item>
+    
+    <item>
       <title>Hello R Markdown</title>
       <link>https://networkingarchives.github.io/blog/2020/12/01/hello-r-markdown/</link>
       <pubDate>Tue, 01 Dec 2020 21:13:14 -0500</pubDate>
