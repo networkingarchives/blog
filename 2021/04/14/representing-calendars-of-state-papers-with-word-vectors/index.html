@@ -161,53 +161,42 @@ euc.dist(pointA, pointB)</code></pre>
 
 plot_ly(data = word_vectors_3d, x =  ~x, y = ~y,z =  ~z, text = ~word) %&gt;% add_markers() %&gt;% layout(title = &quot;3D Representation of Word Vectors&quot;)</code></pre>
 <div id="htmlwidget-1" style="width:672px;height:480px;" class="plotly html-widget"></div>
-<script type="application/json" data-for="htmlwidget-1">{"x":{"visdat":{"316d4b74dfba":["function () ","plotlyVisDat"]},"cur_data":"316d4b74dfba","attrs":{"316d4b74dfba":{"x":{},"y":{},"z":{},"text":{},"alpha_stroke":1,"sizes":[10,100],"spans":[1,20],"type":"scatter3d","mode":"markers","inherit":true}},"layout":{"margin":{"b":40,"l":60,"t":25,"r":10},"title":"3D Representation of Word Vectors","scene":{"xaxis":{"title":"x"},"yaxis":{"title":"y"},"zaxis":{"title":"z"}},"hovermode":"closest","showlegend":false},"source":"A","config":{"showSendToCloud":false},"data":[{"x":[10,8,6,5,6,5,2,1],"y":[0,1,3,5,8,8,10,9],"z":[1,3,5,2,7,8,4,3],"text":["crufts","feed","cat","dog","mouse","rabbit","cape","hero"],"type":"scatter3d","mode":"markers","marker":{"color":"rgba(31,119,180,1)","line":{"color":"rgba(31,119,180,1)"}},"error_y":{"color":"rgba(31,119,180,1)"},"error_x":{"color":"rgba(31,119,180,1)"},"line":{"color":"rgba(31,119,180,1)"},"frame":null}],"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.2,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
+<script type="application/json" data-for="htmlwidget-1">{"x":{"visdat":{"3547e4c000c":["function () ","plotlyVisDat"]},"cur_data":"3547e4c000c","attrs":{"3547e4c000c":{"x":{},"y":{},"z":{},"text":{},"alpha_stroke":1,"sizes":[10,100],"spans":[1,20],"type":"scatter3d","mode":"markers","inherit":true}},"layout":{"margin":{"b":40,"l":60,"t":25,"r":10},"title":"3D Representation of Word Vectors","scene":{"xaxis":{"title":"x"},"yaxis":{"title":"y"},"zaxis":{"title":"z"}},"hovermode":"closest","showlegend":false},"source":"A","config":{"showSendToCloud":false},"data":[{"x":[10,8,6,5,6,5,2,1],"y":[0,1,3,5,8,8,10,9],"z":[1,3,5,2,7,8,4,3],"text":["crufts","feed","cat","dog","mouse","rabbit","cape","hero"],"type":"scatter3d","mode":"markers","marker":{"color":"rgba(31,119,180,1)","line":{"color":"rgba(31,119,180,1)"}},"error_y":{"color":"rgba(31,119,180,1)"},"error_x":{"color":"rgba(31,119,180,1)"},"line":{"color":"rgba(31,119,180,1)"},"frame":null}],"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.2,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
 <p>You can start to understand how the words now cluster together in the 3D plot: rabbit and mouse are clustered together, but now in the third dimension they are further away from dog. We can use the same formula as above to calculate these distances, just by adding the z coordinates to the pointA and pointB vectors:</p>
-<pre class="r"><code>pointA = c(word_vectors$x[word_vectors$word == &#39;dog&#39;], word_vectors$y[word_vectors$word == &#39;dog&#39;], word_vectors$z[word_vectors$word == &#39;dog&#39;])</code></pre>
-<pre><code>## Warning: Unknown or uninitialised column: `z`.</code></pre>
-<pre class="r"><code>pointB = c(word_vectors$x[word_vectors$word == &#39;mouse&#39;], word_vectors$y[word_vectors$word == &#39;mouse&#39;], word_vectors$z[word_vectors$word == &#39;mouse&#39;])</code></pre>
-<pre><code>## Warning: Unknown or uninitialised column: `z`.</code></pre>
-<pre class="r"><code>euc.dist(pointA, pointB)</code></pre>
-<pre><code>## [1] 3.162278</code></pre>
+<pre class="r"><code>pointA = c(word_vectors_3d$x[word_vectors_3d$word == &#39;dog&#39;], word_vectors_3d$y[word_vectors_3d$word == &#39;dog&#39;], word_vectors_3d$z[word_vectors_3d$word == &#39;dog&#39;])
+pointB = c(word_vectors_3d$x[word_vectors_3d$word == &#39;mouse&#39;], word_vectors_3d$y[word_vectors_3d$word == &#39;mouse&#39;], word_vectors_3d$z[word_vectors_3d$word == &#39;mouse&#39;])
+
+euc.dist(pointA, pointB)</code></pre>
+<pre><code>## [1] 5.91608</code></pre>
 <p>The nice thing about the method is that while my brain starts to hurt when I think about more than three dimensions, the maths behind it doesn’t care: you can just keep plugging in longer and longer vectors and it’ll continue to calculate the distances as long as they are the same length. This means you can use this same formula not just when you have x and y coordinates, but also z, a, b, c, d, and so on for as long as you like. This is often called ‘representing words in multi-dimensional euclidean space’, or something similar which sounds great on grant applications but it’s really just doing some plotting and measuring distances. Which means that if you represent all the words in a corpus as a long vector (series of coordinates), you can quickly measure the distance between any two.</p>
-<p>In a large corpus with a properly-constructed vector representation, the semantic relationships between the words start to make a lot of sense. What’s more, because of vector math, you can add, subtract, divide and multiply the words together to get new vectors, and then find the closest to that. Here, we create a new vector, which is pointA - pointB (dog - mouse). Then loop through each vector and calculate the distance, and display in a new dataframe:</p>
+<div id="querying-the-vectors-using-math" class="section level4">
+<h4>Querying the Vectors Using Math</h4>
+<p>In a large corpus with a properly-constructed vector representation, the semantic relationships between the words start to represent some sort of meaning between words and concepts in the underlying source text. It’s quite easy to perform arithmetic on vectors: you can add, subtract, divide and multiply the vectors together to get new ones, and then find the closest words to those.</p>
+<p>Here, I’ve created a new vector, which is pointA - pointB (dog minus mouse). Then loop through each vector and calculate the distance, and display in a new dataframe:</p>
 <pre class="r"><code>pointC = pointA - pointB
 
 df_for_results = tibble()
 for(i in 1:8){
   
-  pointA = c(word_vectors$x[i], word_vectors$y[i], word_vectors$z[i])
-  u = tibble(dist = euc.dist(pointC, pointA), word = word_vectors$word[i])
+  pointA = c(word_vectors_3d$x[i], word_vectors_3d$y[i], word_vectors_3d$z[i])
+  u = tibble(dist = euc.dist(pointC, pointA), word = word_vectors_3d$word[i])
   df_for_results = rbind(df_for_results, u)
-}</code></pre>
-<pre><code>## Warning: Unknown or uninitialised column: `z`.
+}
 
-## Warning: Unknown or uninitialised column: `z`.
-
-## Warning: Unknown or uninitialised column: `z`.
-
-## Warning: Unknown or uninitialised column: `z`.
-
-## Warning: Unknown or uninitialised column: `z`.
-
-## Warning: Unknown or uninitialised column: `z`.
-
-## Warning: Unknown or uninitialised column: `z`.
-
-## Warning: Unknown or uninitialised column: `z`.</code></pre>
-<pre class="r"><code>df_for_results %&gt;% arrange(dist)</code></pre>
+df_for_results %&gt;% arrange(dist)</code></pre>
 <pre><code>## # A tibble: 8 x 2
 ##    dist word  
 ##   &lt;dbl&gt; &lt;chr&gt; 
 ## 1  0    mouse 
-## 2  1    rabbit
-## 3  3.16 dog   
-## 4  4.47 cape  
-## 5  5    cat   
-## 6  5.10 hero  
-## 7  7.28 feed  
-## 8  8.94 crufts</code></pre>
-<p>The closest to dog - mouse is hero, with this vector representation.</p>
+## 2  1.41 rabbit
+## 3  5.39 cat   
+## 4  5.39 cape  
+## 5  5.92 dog   
+## 6  6.48 hero  
+## 7  8.31 feed  
+## 8 10.8  crufts</code></pre>
+<p>The closest to dog - mouse is hero, with this vector representation. In this very tiny dataset this is meaningless, but with a large trained set, as will be shown below, it can give really interesting results.</p>
+</div>
 <div id="from-vectors-to-word-embeddings" class="section level4">
 <h4>From Vectors to Word Embeddings</h4>
 <p>These vectors are also known as word embeddings. Real algorithms base the vectors on more sophisticated metrics than that I used above. Some, such as <a href="https://nlp.stanford.edu/projects/glove/">GloVe</a> record co-occurrence probabilities (the likelihood of every pair of words in a corpus to co-occur within a set ‘window’ of words either side), using a neural network, and pre-trained over enormous corpora of text. The resulting vectors are often used to represent the relationships between modern meanings of words, to <a href="https://dh2017.adho.org/abstracts/582/582.pdf">track semantic changes over time</a>, or to understand the history of <a href="https://ccdkconceptlab.wordpress.com/">concepts</a>, though it’s worth pointing out they’re only as representative as the corpus used (many use sources such as Wikipedia, or Reddit, mostly produced by white men and so there’s a danger of biases towards those groups).</p>
