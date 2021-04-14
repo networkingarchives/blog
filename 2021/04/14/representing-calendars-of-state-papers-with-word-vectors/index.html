@@ -6,8 +6,8 @@
 <meta name="generator" content="Hugo 0.82.0" />
 
 
-<title>Representing the *Calendars of State Papers* with Word Vectors - Networking Archives Blog</title>
-<meta property="og:title" content="Representing the *Calendars of State Papers* with Word Vectors - Networking Archives Blog">
+<title>Exploring the Calendars of State Papers with Word Vectors - Networking Archives Blog</title>
+<meta property="og:title" content="Exploring the Calendars of State Papers with Word Vectors - Networking Archives Blog">
 
 
   <link href='https://networkingarchives.github.io/blog/favicon.ico' rel='icon' type='image/x-icon'/>
@@ -62,10 +62,10 @@
 
   <article class="article">
     
-    <span class="article-duration">25 min read</span>
+    <span class="article-duration">26 min read</span>
     
 
-    <h1 class="article-title">Representing the *Calendars of State Papers* with Word Vectors</h1>
+    <h1 class="article-title">Exploring the Calendars of State Papers with Word Vectors</h1>
 
     
     <span class="article-date">2021-04-14</span>
@@ -86,7 +86,8 @@
 
 <div id="text-and-models" class="section level3">
 <h3>Text and Models</h3>
-<p>Many Digital Humanities projects <a href="https://doi.org/10.1093/llc/fqw045">involve</a> constructing <em>models</em> of text: a general name for a kind of representation of text which makes it in some way easier to interpret. TEI-encoded text is an example of a model: we take the ‘raw material’ of a document, its text, and add elements to it to make it easier to work with and analyse. Models are often further abstracted from the original text. One way we can represent text in a way that a machine can interpret is with a <em>word vector.</em> A word vector is simply a numerical representation of a word within a corpus (a body of text, often a series of documents), usually consisting of a series of numbers in a specified sequence. This type of representation is used for a variety of Natural Language Processing tasks - for instance measuring the similarity between two documents.</p>
+<p>What can a body of text tell us about the worldview of its authors? Many Digital Humanities projects <a href="https://doi.org/10.1093/llc/fqw045">involve</a> constructing <em>models</em>: a general name for a kind of representation of something which makes it in some way easier to interpret. TEI-encoded text is an example of a model: we take the ‘raw material’ of a document, its text, and add elements to it to make it easier to work with and analyse.</p>
+<p>Models are often further abstracted from the original text. One way we can represent text in a way that a machine can interpret is with a <em>word vector.</em> A word vector is simply a numerical representation of a word within a corpus (a body of text, often a series of documents), usually consisting of a series of numbers in a specified sequence. This type of representation is used for a variety of Natural Language Processing tasks - for instance measuring the similarity between two documents.</p>
 <p>This post uses a couple of R packages and a method for creating word vectors with a neural net, called <a href="https://nlp.stanford.edu/projects/glove/">GloVe</a>, to produce a series of vectors which give useful clues as to the semantic links between words in a corpus. The method is then used to analyse the printed summaries of the English State Papers, from <a href="https://www.gale.com/primary-sources/state-papers-online">State Papers Online</a>, and show how they can be used to understand how the association between words and concepts changed over the course of the seventeenth century.</p>
 </div>
 <div id="what-is-a-word-vector-then" class="section level3">
@@ -112,7 +113,7 @@ word_vectors</code></pre>
 ## 6 rabbit     5     8
 ## 7 cape       2    10
 ## 8 hero       1     9</code></pre>
-<p>This data can be represented as a two-dimensional plot where each word is placed on the x and y axes based on their x and y values, like this:</p>
+<p>It’s likely that some words will occur mostly in document A, some mostly in document B, and some evenly spread across both. This data can be represented as a two-dimensional plot where each word is placed on the x and y axes based on their x and y values, like this:</p>
 <pre class="r"><code>ggplot() + 
   geom_point(data = word_vectors, aes(x, y), size =4, alpha = .7) + 
   geom_text_repel(data = word_vectors, aes(x, y, label = word)) + 
@@ -161,7 +162,7 @@ euc.dist(pointA, pointB)</code></pre>
 
 plot_ly(data = word_vectors_3d, x =  ~x, y = ~y,z =  ~z, text = ~word) %&gt;% add_markers() %&gt;% layout(title = &quot;3D Representation of Word Vectors&quot;)</code></pre>
 <div id="htmlwidget-1" style="width:672px;height:480px;" class="plotly html-widget"></div>
-<script type="application/json" data-for="htmlwidget-1">{"x":{"visdat":{"45614869d09a":["function () ","plotlyVisDat"]},"cur_data":"45614869d09a","attrs":{"45614869d09a":{"x":{},"y":{},"z":{},"text":{},"alpha_stroke":1,"sizes":[10,100],"spans":[1,20],"type":"scatter3d","mode":"markers","inherit":true}},"layout":{"margin":{"b":40,"l":60,"t":25,"r":10},"title":"3D Representation of Word Vectors","scene":{"xaxis":{"title":"x"},"yaxis":{"title":"y"},"zaxis":{"title":"z"}},"hovermode":"closest","showlegend":false},"source":"A","config":{"showSendToCloud":false},"data":[{"x":[10,8,6,5,6,5,2,1],"y":[0,1,3,5,8,8,10,9],"z":[1,3,5,2,7,8,4,3],"text":["crufts","feed","cat","dog","mouse","rabbit","cape","hero"],"type":"scatter3d","mode":"markers","marker":{"color":"rgba(31,119,180,1)","line":{"color":"rgba(31,119,180,1)"}},"error_y":{"color":"rgba(31,119,180,1)"},"error_x":{"color":"rgba(31,119,180,1)"},"line":{"color":"rgba(31,119,180,1)"},"frame":null}],"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.2,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
+<script type="application/json" data-for="htmlwidget-1">{"x":{"visdat":{"6d4770db1960":["function () ","plotlyVisDat"]},"cur_data":"6d4770db1960","attrs":{"6d4770db1960":{"x":{},"y":{},"z":{},"text":{},"alpha_stroke":1,"sizes":[10,100],"spans":[1,20],"type":"scatter3d","mode":"markers","inherit":true}},"layout":{"margin":{"b":40,"l":60,"t":25,"r":10},"title":"3D Representation of Word Vectors","scene":{"xaxis":{"title":"x"},"yaxis":{"title":"y"},"zaxis":{"title":"z"}},"hovermode":"closest","showlegend":false},"source":"A","config":{"showSendToCloud":false},"data":[{"x":[10,8,6,5,6,5,2,1],"y":[0,1,3,5,8,8,10,9],"z":[1,3,5,2,7,8,4,3],"text":["crufts","feed","cat","dog","mouse","rabbit","cape","hero"],"type":"scatter3d","mode":"markers","marker":{"color":"rgba(31,119,180,1)","line":{"color":"rgba(31,119,180,1)"}},"error_y":{"color":"rgba(31,119,180,1)"},"error_x":{"color":"rgba(31,119,180,1)"},"line":{"color":"rgba(31,119,180,1)"},"frame":null}],"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.2,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
 <p>You can start to understand how the words now cluster together in the 3D plot: rabbit and mouse are clustered together, but now in the third dimension they are further away from dog. We can use the same formula as above to calculate these distances, just by adding the z coordinates to the pointA and pointB vectors:</p>
 <pre class="r"><code>pointA = c(word_vectors_3d$x[word_vectors_3d$word == &#39;dog&#39;], word_vectors_3d$y[word_vectors_3d$word == &#39;dog&#39;], word_vectors_3d$z[word_vectors_3d$word == &#39;dog&#39;])
 pointB = c(word_vectors_3d$x[word_vectors_3d$word == &#39;mouse&#39;], word_vectors_3d$y[word_vectors_3d$word == &#39;mouse&#39;], word_vectors_3d$z[word_vectors_3d$word == &#39;mouse&#39;])
