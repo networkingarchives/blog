@@ -161,7 +161,7 @@ euc.dist(pointA, pointB)</code></pre>
 
 plot_ly(data = word_vectors_3d, x =  ~x, y = ~y,z =  ~z, text = ~word) %&gt;% add_markers() %&gt;% layout(title = &quot;3D Representation of Word Vectors&quot;)</code></pre>
 <div id="htmlwidget-1" style="width:672px;height:480px;" class="plotly html-widget"></div>
-<script type="application/json" data-for="htmlwidget-1">{"x":{"visdat":{"3e3d12126b7d":["function () ","plotlyVisDat"]},"cur_data":"3e3d12126b7d","attrs":{"3e3d12126b7d":{"x":{},"y":{},"z":{},"text":{},"alpha_stroke":1,"sizes":[10,100],"spans":[1,20],"type":"scatter3d","mode":"markers","inherit":true}},"layout":{"margin":{"b":40,"l":60,"t":25,"r":10},"title":"3D Representation of Word Vectors","scene":{"xaxis":{"title":"x"},"yaxis":{"title":"y"},"zaxis":{"title":"z"}},"hovermode":"closest","showlegend":false},"source":"A","config":{"showSendToCloud":false},"data":[{"x":[10,8,6,5,6,5,2,1],"y":[0,1,3,5,8,8,10,9],"z":[1,3,5,2,7,8,4,3],"text":["crufts","feed","cat","dog","mouse","rabbit","cape","hero"],"type":"scatter3d","mode":"markers","marker":{"color":"rgba(31,119,180,1)","line":{"color":"rgba(31,119,180,1)"}},"error_y":{"color":"rgba(31,119,180,1)"},"error_x":{"color":"rgba(31,119,180,1)"},"line":{"color":"rgba(31,119,180,1)"},"frame":null}],"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.2,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
+<script type="application/json" data-for="htmlwidget-1">{"x":{"visdat":{"431623380b74":["function () ","plotlyVisDat"]},"cur_data":"431623380b74","attrs":{"431623380b74":{"x":{},"y":{},"z":{},"text":{},"alpha_stroke":1,"sizes":[10,100],"spans":[1,20],"type":"scatter3d","mode":"markers","inherit":true}},"layout":{"margin":{"b":40,"l":60,"t":25,"r":10},"title":"3D Representation of Word Vectors","scene":{"xaxis":{"title":"x"},"yaxis":{"title":"y"},"zaxis":{"title":"z"}},"hovermode":"closest","showlegend":false},"source":"A","config":{"showSendToCloud":false},"data":[{"x":[10,8,6,5,6,5,2,1],"y":[0,1,3,5,8,8,10,9],"z":[1,3,5,2,7,8,4,3],"text":["crufts","feed","cat","dog","mouse","rabbit","cape","hero"],"type":"scatter3d","mode":"markers","marker":{"color":"rgba(31,119,180,1)","line":{"color":"rgba(31,119,180,1)"}},"error_y":{"color":"rgba(31,119,180,1)"},"error_x":{"color":"rgba(31,119,180,1)"},"line":{"color":"rgba(31,119,180,1)"},"frame":null}],"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.2,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
 <p>You can start to understand how the words now cluster together in the 3D plot: rabbit and mouse are clustered together, but now in the third dimension they are further away from dog. We can use the same formula as above to calculate these distances, just by adding the z coordinates to the pointA and pointB vectors:</p>
 <pre class="r"><code>pointA = c(word_vectors_3d$x[word_vectors_3d$word == &#39;dog&#39;], word_vectors_3d$y[word_vectors_3d$word == &#39;dog&#39;], word_vectors_3d$z[word_vectors_3d$word == &#39;dog&#39;])
 pointB = c(word_vectors_3d$x[word_vectors_3d$word == &#39;mouse&#39;], word_vectors_3d$y[word_vectors_3d$word == &#39;mouse&#39;], word_vectors_3d$z[word_vectors_3d$word == &#39;mouse&#39;])
@@ -340,7 +340,7 @@ head(sort(cos_sim[,1], decreasing = TRUE), 20)
 ## 0.6976267 0.6896181 0.6853372 0.6558982 0.6178040 0.6116087 0.6066610 0.6059600 
 ##      life   servant    wife&#39;s     uncle 
 ## 0.5971647 0.5971094 0.5952873 0.5922310</code></pre>
-<p>Unsurprisingly wife is most similar to other words relating to family. What about husband?</p>
+<p>It seems that <em>wife</em> is most similar to other words relating to family. What about <em>husband</em>?</p>
 <pre class="r"><code>ten_closest_words(&#39;husband&#39;)</code></pre>
 <pre><code>##   husband      wife     child     widow    mother    sister  daughter   brother 
 ## 1.0000000 0.8191674 0.7370158 0.6531169 0.6276656 0.6243364 0.6201605 0.6070677 
@@ -348,8 +348,8 @@ head(sort(cos_sim[,1], decreasing = TRUE), 20)
 ## 0.6062919 0.5999262 0.5989705 0.5983755 0.5849611 0.5637674 0.5615799 0.5615049 
 ##  prisoner  petition      debt husband&#39;s 
 ## 0.5565017 0.5536114 0.5517856 0.5496583</code></pre>
-<p>Husband is mostly similar but with some interesting different associations: ‘widow’, ‘die’, ‘petition’, ‘debt’, and ‘prisoner’, reflecting the fact that there is a large group of petitions in the State Papers written by women looking for pardons or clemency for their husbands, particularly following the Monmouth Rebellion in 1683.</p>
-<p>Looking at the closest words to place names gives some interesting associations. Amsterdam is associated with terms related to shipping and trade:</p>
+<p><em>Husband</em> is mostly similar but with some interesting different associations: <em>widow</em>, <em>die</em>, <em>petition</em>, <em>debt</em>, and <em>prisoner</em>, reflecting the fact that there is a large group of petitions in the State Papers written by women looking for pardons or clemency for their husbands, particularly following the Monmouth Rebellion in 1683.</p>
+<p>Looking at the closest words to place names gives some interesting associations. <em>Amsterdam</em> is associated with terms related to shipping and trade:</p>
 <pre class="r"><code>ten_closest_words(&#39;amsterdam&#39;)</code></pre>
 <pre><code>## amsterdam rotterdam      lade  bordeaux   hamburg   holland    richly     dutch 
 ## 1.0000000 0.7252002 0.6393961 0.5937090 0.5631972 0.5539730 0.5471240 0.5428466 
@@ -357,7 +357,7 @@ head(sort(cos_sim[,1], decreasing = TRUE), 20)
 ## 0.5420471 0.5295916 0.5276372 0.5258728 0.5229681 0.5200589 0.5122757 0.5090996 
 ##    london    french  rochelle    nantes 
 ## 0.5088864 0.5063027 0.5030953 0.5019438</code></pre>
-<p>Whereas Rome is very much associated with religion and ecclesiastical politics:</p>
+<p>Whereas <em>Rome</em> is very much associated with religion and ecclesiastical politics:</p>
 <pre class="r"><code>ten_closest_words(&#39;rome&#39;)</code></pre>
 <pre><code>##       rome       pope     jesuit     priest      friar     nuncio   cardinal 
 ##  1.0000000  0.6357303  0.6291777  0.5639153  0.5457535  0.5339667  0.5221153 
@@ -381,7 +381,7 @@ head(sort(cos_sim_test[,1], decreasing = T), 20)</code></pre>
 ##  0.6601502  0.6553503  0.6457852  0.6442256  0.6426027  0.6372307  0.6346641 
 ##        day      bring       note    arrival williamson       week 
 ##  0.6346036  0.6327272  0.6321395  0.6297362  0.6263445  0.6220473</code></pre>
-<p>It is also a way of finding analogies: so, for example, Paris - France + Germany should equal to ‘Berlin’, because Berlin is like the Paris of France. Is that what we get?</p>
+<p>It is also a way of finding analogies: so, for example, <em>Paris</em> - <em>France</em> + <em>Germany</em> should equal to <em>Berlin</em>, because Berlin is like the Paris of France. Is that what we get?</p>
 <pre class="r"><code>test = word_vectors[&quot;paris&quot;, , drop = F] -
   word_vectors[&quot;france&quot;, , drop = F] +
   word_vectors[&quot;germany&quot;, , drop = F]
