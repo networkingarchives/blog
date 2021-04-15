@@ -6,24 +6,24 @@
     <description>Recent content in Posts on Networking Archives Blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Thu, 15 Apr 2021 00:00:00 +0000</lastBuildDate><atom:link href="https://networkingarchives.github.io/blog/post/index.xml" rel="self" type="application/rss+xml" />
-    <item>
-      <title>R and Wikidata</title>
-      <link>https://networkingarchives.github.io/blog/2021/04/15/r-and-wikidata/</link>
-      <pubDate>Thu, 15 Apr 2021 00:00:00 +0000</pubDate>
-      
-      <guid>https://networkingarchives.github.io/blog/2021/04/15/r-and-wikidata/</guid>
-      <description>This is an R Notebook: a document containing code and text. A live version can be run through MyBinder, which will spin up a copy of R-studio for you to use, and the source code is available on GitHub.
-Clicking on the MyBinder link above will bring you to an R-Studio instance. In the ‘files’ window in the bottom-right of R-studio, open the document ‘r_and_wikidata.Rmd’, which will open this with a live copy of the code, which can be edited and re-run.</description>
-    </item>
-    
+    <lastBuildDate>Wed, 14 Apr 2021 00:00:00 +0000</lastBuildDate><atom:link href="https://networkingarchives.github.io/blog/post/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Text Mining the State Papers</title>
       <link>https://networkingarchives.github.io/blog/2021/04/14/text-mining/</link>
       <pubDate>Wed, 14 Apr 2021 00:00:00 +0000</pubDate>
       
       <guid>https://networkingarchives.github.io/blog/2021/04/14/text-mining/</guid>
-      <description>Calendars of State Papers and Networking Archives Most of the quantitative research on the Networking Archives project has been using the metadata from the digitised correspondence of [State Papers Online](https://www.gale.com/primary-sources/state-papers-online. Metadata in this sense means everything except the content of the letters: including author names, recipient names, date, place of sending and so on, in the research of seventeenth-century intelligencing. Gale State Papers Online brings together a number of historical primary sources, not only the manuscript images from the State Papers, but also full text versions of the ‘Calendars of State Papers’, a set of printed finding aids mostly produced in the nineteenth century.</description>
+      <description>Calendars of State Papers and Networking Archives Most of the quantitative research on the Networking Archives project has been using the metadata from the digitised correspondence of State Papers Online. Metadata in this sense means everything except the content of the letters: including author names, recipient names, date, place of sending and so on, in the research of seventeenth-century intelligencing. Gale State Papers Online brings together a number of historical primary sources, not only the manuscript images from the State Papers, but also full text versions of the ‘Calendars of State Papers’, a set of printed finding aids mostly produced in the nineteenth century.</description>
+    </item>
+    
+    <item>
+      <title>R and Wikidata</title>
+      <link>https://networkingarchives.github.io/blog/2021/02/15/r-and-wikidata/</link>
+      <pubDate>Mon, 15 Feb 2021 00:00:00 +0000</pubDate>
+      
+      <guid>https://networkingarchives.github.io/blog/2021/02/15/r-and-wikidata/</guid>
+      <description>This is an R Notebook: a document containing code and text. A live version can be run through MyBinder, which will spin up a copy of R-studio for you to use, and the source code is available on GitHub.
+Clicking on the MyBinder link above will bring you to an R-Studio instance. In the ‘files’ window in the bottom-right of R-studio, open the document ‘r_and_wikidata.Rmd’, which will open this with a live copy of the code, which can be edited and re-run.</description>
     </item>
     
   </channel>
