@@ -62,7 +62,7 @@
 
   <article class="article">
     
-    <span class="article-duration">15 min read</span>
+    <span class="article-duration">16 min read</span>
     
 
     <h1 class="article-title">R and Wikidata</h1>
@@ -74,6 +74,7 @@
     <div class="article-content">
       
 <script src="https://networkingarchives.github.io/blog/2021/04/15/r-and-wikidata/index_files/header-attrs/header-attrs.js"></script>
+<link href="https://networkingarchives.github.io/blog/2021/04/15/r-and-wikidata/index_files/tabwid/tabwid.css" rel="stylesheet" />
 
 
 <hr />
@@ -113,18 +114,18 @@ WHERE
 <p>The result is an R dataframe - here are the first ten records:</p>
 <pre class="r"><code>my_query %&gt;% head(10)</code></pre>
 <pre><code>## # A tibble: 10 x 2
-##    item                                   itemLabel                            
-##    &lt;chr&gt;                                  &lt;chr&gt;                                
-##  1 http://www.wikidata.org/entity/Q452335 Thomas Willis                        
-##  2 http://www.wikidata.org/entity/Q474930 Pierre Raymond de Montmort           
-##  3 http://www.wikidata.org/entity/Q505118 Henri Pitot                          
-##  4 http://www.wikidata.org/entity/Q584403 Gilbert Sheldon                      
-##  5 http://www.wikidata.org/entity/Q590501 Lorenzo Magalotti                    
-##  6 http://www.wikidata.org/entity/Q708421 Arthur Annesley, 1st Earl of Anglesey
-##  7 http://www.wikidata.org/entity/Q712899 Richard Bentley                      
-##  8 http://www.wikidata.org/entity/Q726087 Richard Bradley                      
-##  9 http://www.wikidata.org/entity/Q634184 Daniel de Superville                 
-## 10 http://www.wikidata.org/entity/Q562265 John Harris</code></pre>
+##    item                                    itemLabel                            
+##    &lt;chr&gt;                                   &lt;chr&gt;                                
+##  1 http://www.wikidata.org/entity/Q2725340 Christopher Middleton                
+##  2 http://www.wikidata.org/entity/Q2557180 Archibald Campbell, 9th Earl of Argy…
+##  3 http://www.wikidata.org/entity/Q2573060 Robert Spencer, 2nd Earl of Sunderla…
+##  4 http://www.wikidata.org/entity/Q2577971 William Ball                         
+##  5 http://www.wikidata.org/entity/Q2579338 William Houstoun                     
+##  6 http://www.wikidata.org/entity/Q2702018 Edward Montagu, 2nd Earl of Manchest…
+##  7 http://www.wikidata.org/entity/Q2708598 Philip Yorke, 1st Earl of Hardwicke  
+##  8 http://www.wikidata.org/entity/Q2855776 John Somers, 1st Baron Somers        
+##  9 http://www.wikidata.org/entity/Q2422246 Thomas Bates                         
+## 10 http://www.wikidata.org/entity/Q3057690 Joseph Moxon</code></pre>
 <p>What does this have to do with Networking Archives? Both datasets we’re using have extensive (though far from complete) linked data in the form of wikipedia links (for people) and wikidata entities (for places). Through this it is easy to join both EMLO and the State Papers Online to this extensive knowledge base and gain a new perspective on the data.</p>
 </div>
 <div id="charting-birth-and-death-dates-in-the-stuart-state-papers" class="section level3">
@@ -173,8 +174,8 @@ glimpse(dates_of_birth_joined)</code></pre>
 <pre><code>## Rows: 3,456
 ## Columns: 4
 ## $ item        &lt;chr&gt; &quot;http://www.wikidata.org/entity/Q65766&quot;, &quot;http://www.wiki…
-## $ dateOfBirth &lt;dttm&gt; 1605-08-06, 1583-11-10, 1620-08-26, 1655-10-04, 1620-12-…
-## $ dateOfDeath &lt;chr&gt; &quot;1673-02-12&quot;, &quot;1667-06-19&quot;, &quot;1684-02-06&quot;, &quot;1729-01-30&quot;, &quot;…
+## $ dateOfBirth &lt;dttm&gt; 1605-08-06, 1567-05-19, 1606-10-15, 1606-10-12, 1593-07-…
+## $ dateOfDeath &lt;chr&gt; &quot;1673-02-12&quot;, &quot;1618-05-24&quot;, &quot;1678-09-19&quot;, &quot;1678-09-19&quot;, &quot;…
 ## $ article     &lt;chr&gt; &quot;https://en.wikipedia.org/wiki/Johann_Philipp_von_Sch%C3%…</code></pre>
 <p>About 3,000 individuals in the State Papers Online with dates of birth/death have been found. This basic information can be charted, for example:</p>
 <pre class="r"><code>dates_of_birth_joined %&gt;% 
@@ -338,24 +339,63 @@ SERVICE wikibase:label { bd:serviceParam wikibase:language &#39;en&#39;. }
 <p><code>?item wdt:P40  ?child.</code> Get all those with the property P40 (child) for each ?item above</p>
 <p><code>?child wdt:P569 ?dob.</code> Get their dates of birth (for filtering)</p>
 <p>Again, cross-reference this list against a master list of wikipedia IDs for people on EMLO:</p>
-<pre class="r"><code>rs_q %&gt;% 
+<pre class="r"><code>library(flextable)
+rs_q %&gt;% 
   filter(article %in% emlo_wikipedia_links$resource_url) %&gt;% 
   filter(!is.na(article)) %&gt;% 
-  select(person = childLabel, parent = itemLabel)</code></pre>
-<pre><code>## # A tibble: 23 x 2
-##    person                                   parent                              
-##    &lt;chr&gt;                                    &lt;chr&gt;                               
-##  1 Algernon Percy, 10th Earl of Northumber… Henry Percy, 9th Earl of Northumber…
-##  2 Carew Raleigh                            Walter Raleigh                      
-##  3 Anne Bacon                               Anthony Cooke                       
-##  4 John Dudley, 1st Duke of Northumberland  Edmund Dudley                       
-##  5 Henry Percy, 9th Earl of Northumberland  Henry Percy, 8th Earl of Northumber…
-##  6 Charles Bruce, 3rd Earl of Ailesbury     Thomas Bruce, 2nd Earl of Ailesbury 
-##  7 George Legge, 1st Baron Dartmouth        William Legge                       
-##  8 Horace Walpole                           Robert Walpole                      
-##  9 Cardinal de Bouillon                     Frédéric Maurice de La Tour d&#39;Auver…
-## 10 Alethea Howard, Countess of Arundel      Mary Talbot, Countess of Shrewsbury 
-## # … with 13 more rows</code></pre>
+  select(person = childLabel, parent = itemLabel) %&gt;% flextable() %&gt;% theme_vanilla()</code></pre>
+<template id="af6cdc02-0193-4811-8ae8-da84e743cf10"><style>
+.tabwid table{
+  border-collapse:collapse;
+  line-height:1;
+  margin-left:auto;
+  margin-right:auto;
+  border-width: 0;
+  display: table;
+  margin-top: 1.275em;
+  margin-bottom: 1.275em;
+  border-spacing: 0;
+  border-color: transparent;
+}
+.tabwid_left table{
+  margin-left:0;
+}
+.tabwid_right table{
+  margin-right:0;
+}
+.tabwid td {
+    padding: 0;
+}
+.tabwid a {
+  text-decoration: none;
+}
+.tabwid thead {
+    background-color: transparent;
+}
+.tabwid tfoot {
+    background-color: transparent;
+}
+.tabwid table tr {
+background-color: transparent;
+}
+</style><div class="tabwid"><style>.cl-c81dc66a{border-collapse:collapse;}.cl-c816af42{font-family:'Helvetica';font-size:11pt;font-weight:bold;font-style:normal;text-decoration:none;color:rgba(0, 0, 0, 1.00);background-color:transparent;}.cl-c816af6a{font-family:'Helvetica';font-size:11pt;font-weight:normal;font-style:normal;text-decoration:none;color:rgba(0, 0, 0, 1.00);background-color:transparent;}.cl-c816c838{margin:0;text-align:left;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:5pt;padding-top:5pt;padding-left:5pt;padding-right:5pt;line-height: 1;background-color:transparent;}.cl-c81709ec{width:54pt;background-color:transparent;vertical-align: middle;border-bottom: 0.5pt solid rgba(102, 102, 102, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-c8170a14{width:54pt;background-color:transparent;vertical-align: middle;border-bottom: 0.5pt solid rgba(102, 102, 102, 1.00);border-top: 0.5pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-c8170a1e{width:54pt;background-color:transparent;vertical-align: middle;border-bottom: 2pt solid rgba(102, 102, 102, 1.00);border-top: 0.5pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-c8170a28{width:54pt;background-color:transparent;vertical-align: middle;border-bottom: 2pt solid rgba(102, 102, 102, 1.00);border-top: 2pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}</style><table class='cl-c81dc66a'>
+<thead><tr style="overflow-wrap:break-word;"><td class="cl-c8170a28"><p class="cl-c816c838"><span class="cl-c816af42">person</span></p></td><td class="cl-c8170a28"><p class="cl-c816c838"><span class="cl-c816af42">parent</span></p></td></tr></thead><tbody><tr style="overflow-wrap:break-word;"><td class="cl-c81709ec"><p class="cl-c816c838"><span class="cl-c816af6a">Algernon Percy, 10th Earl of Northumberland</span></p></td><td class="cl-c81709ec"><p class="cl-c816c838"><span class="cl-c816af6a">Henry Percy, 9th Earl of Northumberland</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-c8170a14"><p class="cl-c816c838"><span class="cl-c816af6a">John Dudley, 1st Duke of Northumberland</span></p></td><td class="cl-c8170a14"><p class="cl-c816c838"><span class="cl-c816af6a">Edmund Dudley</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-c8170a14"><p class="cl-c816c838"><span class="cl-c816af6a">Henry Percy, 9th Earl of Northumberland</span></p></td><td class="cl-c8170a14"><p class="cl-c816c838"><span class="cl-c816af6a">Henry Percy, 8th Earl of Northumberland</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-c8170a14"><p class="cl-c816c838"><span class="cl-c816af6a">Cardinal de Bouillon</span></p></td><td class="cl-c8170a14"><p class="cl-c816c838"><span class="cl-c816af6a">Frédéric Maurice de La Tour d'Auvergne</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-c8170a14"><p class="cl-c816c838"><span class="cl-c816af6a">Mary Dudley, Lady Sidney</span></p></td><td class="cl-c8170a14"><p class="cl-c816c838"><span class="cl-c816af6a">Jane Dudley, Duchess of Northumberland</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-c8170a14"><p class="cl-c816c838"><span class="cl-c816af6a">Mary Dudley, Lady Sidney</span></p></td><td class="cl-c8170a14"><p class="cl-c816c838"><span class="cl-c816af6a">John Dudley, 1st Duke of Northumberland</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-c8170a14"><p class="cl-c816c838"><span class="cl-c816af6a">George Legge, 1st Baron Dartmouth</span></p></td><td class="cl-c8170a14"><p class="cl-c816c838"><span class="cl-c816af6a">William Legge</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-c8170a14"><p class="cl-c816c838"><span class="cl-c816af6a">Carew Raleigh</span></p></td><td class="cl-c8170a14"><p class="cl-c816c838"><span class="cl-c816af6a">Walter Raleigh</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-c8170a14"><p class="cl-c816c838"><span class="cl-c816af6a">Margaret Roper</span></p></td><td class="cl-c8170a14"><p class="cl-c816c838"><span class="cl-c816af6a">Thomas More</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-c8170a14"><p class="cl-c816c838"><span class="cl-c816af6a">Charles Bruce, 3rd Earl of Ailesbury</span></p></td><td class="cl-c8170a14"><p class="cl-c816c838"><span class="cl-c816af6a">Thomas Bruce, 2nd Earl of Ailesbury</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-c8170a14"><p class="cl-c816c838"><span class="cl-c816af6a">Alethea Howard, Countess of Arundel</span></p></td><td class="cl-c8170a14"><p class="cl-c816c838"><span class="cl-c816af6a">Mary Talbot, Countess of Shrewsbury</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-c8170a14"><p class="cl-c816c838"><span class="cl-c816af6a">Horace Walpole</span></p></td><td class="cl-c8170a14"><p class="cl-c816c838"><span class="cl-c816af6a">Robert Walpole</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-c8170a14"><p class="cl-c816c838"><span class="cl-c816af6a">Edward Montagu, 2nd Baron Montagu of Boughton</span></p></td><td class="cl-c8170a14"><p class="cl-c816c838"><span class="cl-c816af6a">Edward Montagu, 1st Baron Montagu of Boughton</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-c8170a14"><p class="cl-c816c838"><span class="cl-c816af6a">Sir James Langham, 2nd Baronet</span></p></td><td class="cl-c8170a14"><p class="cl-c816c838"><span class="cl-c816af6a">Sir John Langham, 1st Baronet</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-c8170a14"><p class="cl-c816c838"><span class="cl-c816af6a">Sir James Langham, 2nd Baronet</span></p></td><td class="cl-c8170a14"><p class="cl-c816c838"><span class="cl-c816af6a">Sir John Langham, 1st Baronet</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-c8170a14"><p class="cl-c816c838"><span class="cl-c816af6a">Thomas Paget, 3rd Baron Paget</span></p></td><td class="cl-c8170a14"><p class="cl-c816c838"><span class="cl-c816af6a">William Paget, 1st Baron Paget</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-c8170a14"><p class="cl-c816c838"><span class="cl-c816af6a">Robert Phelips</span></p></td><td class="cl-c8170a14"><p class="cl-c816c838"><span class="cl-c816af6a">Robert Phelips</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-c8170a14"><p class="cl-c816c838"><span class="cl-c816af6a">John Malet</span></p></td><td class="cl-c8170a14"><p class="cl-c816c838"><span class="cl-c816af6a">Thomas Malet</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-c8170a14"><p class="cl-c816c838"><span class="cl-c816af6a">Thomas Wentworth, 5th Baron Wentworth</span></p></td><td class="cl-c8170a14"><p class="cl-c816c838"><span class="cl-c816af6a">Thomas Wentworth, 1st Earl of Cleveland</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-c8170a14"><p class="cl-c816c838"><span class="cl-c816af6a">William Wentworth, 2nd Earl of Strafford</span></p></td><td class="cl-c8170a14"><p class="cl-c816c838"><span class="cl-c816af6a">Thomas Wentworth, 1st Earl of Strafford</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-c8170a14"><p class="cl-c816c838"><span class="cl-c816af6a">Mildred Cooke</span></p></td><td class="cl-c8170a14"><p class="cl-c816c838"><span class="cl-c816af6a">Anthony Cooke</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-c8170a14"><p class="cl-c816c838"><span class="cl-c816af6a">Thomas Wriothesley, 4th Earl of Southampton</span></p></td><td class="cl-c8170a14"><p class="cl-c816c838"><span class="cl-c816af6a">Henry Wriothesley, 3rd Earl of Southampton</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-c8170a1e"><p class="cl-c816c838"><span class="cl-c816af6a">Anne Bacon</span></p></td><td class="cl-c8170a1e"><p class="cl-c816c838"><span class="cl-c816af6a">Anthony Cooke</span></p></td></tr></tbody></table></div></template>
+<div class="flextable-shadow-host" id="05d69862-13d0-49b3-898a-f5ee6ef6438d"></div>
+<script>
+var dest = document.getElementById("05d69862-13d0-49b3-898a-f5ee6ef6438d");
+var template = document.getElementById("af6cdc02-0193-4811-8ae8-da84e743cf10");
+var caption = template.content.querySelector("caption");
+if(caption) {
+  caption.style.cssText = "display:block;text-align:center;";
+  var newcapt = document.createElement("p");
+  newcapt.appendChild(caption)
+  dest.parentNode.insertBefore(newcapt, dest.previousSibling);
+}
+var fantome = dest.attachShadow({mode: 'open'});
+var templateContent = template.content;
+fantome.appendChild(templateContent);
+</script>
+
 <p>Wikidata has found thirty, including <a href="http://emlo.bodleian.ox.ac.uk/profile/person/e7bef3df-3f0b-4a2d-a737-a4a9b735d2c5">Carew Raleigh</a>, son of Walter Raleigh, and <a href="http://emlo.bodleian.ox.ac.uk/profile/person/4063376c-1017-4e2b-aeee-f507cd72dea7">Horace Walpole</a>, whose father, Robert, was imprisoned in the Tower for 6 months in 1712 for ‘venality’, as well as <a href="http://emlo.bodleian.ox.ac.uk/profile/person/0074d82b-62ce-4d57-82f1-cf31a6067e49">Henrietta Goldolphin</a> - her father, John Churchill, first Duke of Marlborough was imprisoned in the Tower in 1692, accused of signing a letter calling for the restoration of James II.</p>
 </div>
 <div id="linking-letters-in-the-state-papers-online-to-wikidata" class="section level3">
