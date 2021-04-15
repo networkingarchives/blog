@@ -1,0 +1,747 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="generator" content="Hugo 0.82.0" />
+
+
+<title>Exploring the Calendars of State Papers with Word Vectors - Networking Archives Blog</title>
+<meta property="og:title" content="Exploring the Calendars of State Papers with Word Vectors - Networking Archives Blog">
+
+
+  <link href='https://networkingarchives.github.io/blog/favicon.ico' rel='icon' type='image/x-icon'/>
+
+
+
+  
+
+
+
+
+
+
+
+
+<link href='//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css' rel='stylesheet' type='text/css' />
+
+
+
+<link rel="stylesheet" href="/blog/css/fonts.css" media="all">
+<link rel="stylesheet" href="/blog/css/main.css" media="all">
+
+
+
+  </head>
+  <body>
+    <div class="wrapper">
+      <header class="header">
+        <nav class="nav">
+  <a href="/blog/" class="nav-logo">
+    <img src="/blog/images/logo.png"
+         width="50"
+         height="50"
+         alt="Logo">
+  </a>
+
+  <ul class="nav-links">
+    
+    <li><a href="/blog/about/">About</a></li>
+    
+    <li><a href="https://github.com/networkingarchives">GitHub</a></li>
+    
+    <li><a href="https://twitter.com/networkarchives">Twitter</a></li>
+    
+  </ul>
+</nav>
+
+      </header>
+
+
+<main class="content" role="main">
+
+  <article class="article">
+    
+
+    <h1 class="article-title">Exploring the Calendars of State Papers with Word Vectors</h1>
+
+    
+
+    <div class="article-content">
+      
+<script src="https://networkingarchives.github.io/blog/archive/representing-calendars-of-state-papers-with-word-vectors/index_files/header-attrs/header-attrs.js"></script>
+<script src="https://networkingarchives.github.io/blog/archive/representing-calendars-of-state-papers-with-word-vectors/index_files/htmlwidgets/htmlwidgets.js"></script>
+<script src="https://networkingarchives.github.io/blog/archive/representing-calendars-of-state-papers-with-word-vectors/index_files/plotly-binding/plotly.js"></script>
+<script src="https://networkingarchives.github.io/blog/archive/representing-calendars-of-state-papers-with-word-vectors/index_files/typedarray/typedarray.min.js"></script>
+<script src="https://networkingarchives.github.io/blog/archive/representing-calendars-of-state-papers-with-word-vectors/index_files/jquery/jquery.min.js"></script>
+<link href="https://networkingarchives.github.io/blog/archive/representing-calendars-of-state-papers-with-word-vectors/index_files/crosstalk/css/crosstalk.css" rel="stylesheet" />
+<script src="https://networkingarchives.github.io/blog/archive/representing-calendars-of-state-papers-with-word-vectors/index_files/crosstalk/js/crosstalk.min.js"></script>
+<link href="https://networkingarchives.github.io/blog/archive/representing-calendars-of-state-papers-with-word-vectors/index_files/plotly-htmlwidgets-css/plotly-htmlwidgets.css" rel="stylesheet" />
+<script src="https://networkingarchives.github.io/blog/archive/representing-calendars-of-state-papers-with-word-vectors/index_files/plotly-main/plotly-latest.min.js"></script>
+
+
+<div id="text-and-models" class="section level3">
+<h3>Text and Models</h3>
+<p>What can a body of text tell us about the worldview of its authors? Many Digital Humanities projects <a href="https://doi.org/10.1093/llc/fqw045">involve</a> constructing <em>models</em>: a general name for a kind of representation of something which makes it in some way easier to interpret. TEI-encoded text is an example of a model: we take the ‘raw material’ of a document, its text, and add elements to it to make it easier to work with and analyse.</p>
+<p>Models are often further abstracted from the original text. One way we can represent text in a way that a machine can interpret is with a <em>word vector.</em> A word vector is simply a numerical representation of a word within a corpus (a body of text, often a series of documents), usually consisting of a series of numbers in a specified sequence. This type of representation is used for a variety of Natural Language Processing tasks - for instance measuring the similarity between two documents.</p>
+<p>This post uses a couple of R packages and a method for creating word vectors with a neural net, called <a href="https://nlp.stanford.edu/projects/glove/">GloVe</a>, to produce a series of vectors which give useful clues as to the semantic links between words in a corpus. The method is then used to analyse the printed summaries of the English State Papers, from <a href="https://www.gale.com/primary-sources/state-papers-online">State Papers Online</a>, and show how they can be used to understand how the association between words and concepts changed over the course of the seventeenth century.</p>
+</div>
+<div id="what-is-a-word-vector-then" class="section level3">
+<h3>What is a Word Vector, Then?</h3>
+<p>First, I’ll try to briefly explain word vectors. Imagine you have two documents in a corpus. One of them is an article about pets, and the other is a piece of fiction about a team of crime fighting animal superheroes. We’ll call them document A and document B. One way to represent the words within these documents as a vector would be to use the counts of each word per document.</p>
+<p>To do this, you could give each word a set of coordinates, <span class="math inline">\(x\)</span> and <span class="math inline">\(y\)</span>, where <span class="math inline">\(x\)</span> is a count of how many times the word appears in document A and <span class="math inline">\(y\)</span> the number of times it appears in document B.</p>
+<p>The first step is to make a dataframe with the relevant counts:</p>
+<pre class="r"><code>library(ggrepel)
+library(tidyverse)
+word_vectors = tibble(word = c(&#39;crufts&#39;, &#39;feed&#39;, &#39;cat&#39;, &#39;dog&#39;, &#39;mouse&#39;, &#39;rabbit&#39;, &#39;cape&#39;, &#39;hero&#39; ),
+      x = c(10, 8, 6, 5, 6, 5, 2, 1),
+      y = c(0, 1, 3, 5, 8, 8, 10, 9))
+
+word_vectors</code></pre>
+<pre><code>## # A tibble: 8 x 3
+##   word       x     y
+##   &lt;chr&gt;  &lt;dbl&gt; &lt;dbl&gt;
+## 1 crufts    10     0
+## 2 feed       8     1
+## 3 cat        6     3
+## 4 dog        5     5
+## 5 mouse      6     8
+## 6 rabbit     5     8
+## 7 cape       2    10
+## 8 hero       1     9</code></pre>
+<p>It’s likely that some words will occur mostly in document A, some mostly in document B, and some evenly spread across both. This data can be represented as a two-dimensional plot where each word is placed on the x and y axes based on their x and y values, like this:</p>
+<pre class="r"><code>ggplot() + 
+  geom_point(data = word_vectors, aes(x, y), size =4, alpha = .7) + 
+  geom_text_repel(data = word_vectors, aes(x, y, label = word)) + 
+  theme_bw() + 
+  labs(title = &quot;Words Represented in Two-dimension Space&quot;) + 
+  theme(title = element_text(face = &#39;bold&#39;)) + 
+  scale_x_continuous(breaks = 1:10) + 
+  scale_y_continuous(breaks = 1:10)</code></pre>
+<p><img src="https://networkingarchives.github.io/blog/archive/representing-calendars-of-state-papers-with-word-vectors/index_files/figure-html/unnamed-chunk-2-1.png" width="672" /></p>
+<p>Each word is represented as a <em>vector</em> of length 2: ‘rabbit’ is a vector containing two numbers: {5,8}, for example. Using very basic maths we can calculate the <em>euclidean</em> <em>distance</em> between any pair of words. More or less the only thing I can remember from secondary school math is how to calculate the distance between two points on a graph, using the following formula:</p>
+<p><span class="math display">\[
+\sqrt {\left( {x_1 - x_2 } \right)^2 + \left( {y_1 - y_2 } \right)^2 }
+\]</span></p>
+<p>Where <span class="math inline">\(x\)</span> is the first point and <span class="math inline">\(y\)</span> the second. This can easily be turned into a function in R, which takes a set of coordinates (the arguments x1 and x2) and returns the euclidean distance:</p>
+<pre class="r"><code>euc.dist &lt;- function(x1, x2) sqrt(sum((pointA - pointB) ^ 2))</code></pre>
+<p>To get the distance between ‘crufts’ and ‘mouse’, set pointA as the <span class="math inline">\(x\)</span> and <span class="math inline">\(y\)</span> ccoordinates for the first entry in the dataframe of coordinates we created above, and pointB the coordinates for the fifth entry:</p>
+<pre class="r"><code>pointA = c(word_vectors$x[1], word_vectors$y[1])
+pointB = c(word_vectors$x[5], word_vectors$y[5])
+
+euc.dist(pointA, pointB)</code></pre>
+<pre><code>## [1] 8.944272</code></pre>
+<p>Representing a pair of words as vectors and measuring the distance between them is commonly used to suggest a semantic link between the two. For instance, the distance between <em>hero</em> and <em>cape</em> in this corpus is small, because they have similar properties: they both occur mostly in the document about superheroes and rarely in the document about pets.</p>
+<pre class="r"><code>pointA = c(word_vectors$x[word_vectors$word == &#39;hero&#39;], word_vectors$y[word_vectors$word == &#39;hero&#39;])
+
+pointB = c(word_vectors$x[word_vectors$word == &#39;cape&#39;], word_vectors$y[word_vectors$word == &#39;cape&#39;])
+
+euc.dist(pointA, pointB)</code></pre>
+<pre><code>## [1] 1.414214</code></pre>
+<p>This suggests that the model has ‘learned’ that in this corpus, <em>hero</em> and <em>cape</em> are semantically more closely linked than other pairs in the dataset. The difference between <em>cape</em> and <em>feed</em>, on the other hand, is large, because one appears often in the superheroes article and rarely in the other, and vice versa.</p>
+<pre class="r"><code>pointA = c(word_vectors$x[word_vectors$word == &#39;cape&#39;], word_vectors$y[word_vectors$word == &#39;cape&#39;])
+
+pointB = c(word_vectors$x[word_vectors$word == &#39;feed&#39;], word_vectors$y[word_vectors$word == &#39;feed&#39;])
+
+euc.dist(pointA, pointB)</code></pre>
+<pre><code>## [1] 10.81665</code></pre>
+</div>
+<div id="multi-dimensional-vectors" class="section level3">
+<h3>Multi-Dimensional Vectors</h3>
+<p>These vectors, each consisting of two numbers, can be thought of as two-dimensional vectors: a type which can be represented on a 2D scatterplot as <span class="math inline">\(x\)</span> and <span class="math inline">\(y\)</span>. It’s very easy to add a third dimension, <span class="math inline">\(z\)</span>:</p>
+<pre class="r"><code>word_vectors_3d = tibble(word = c(&#39;crufts&#39;, &#39;feed&#39;, &#39;cat&#39;, &#39;dog&#39;, &#39;mouse&#39;, &#39;rabbit&#39;, &#39;cape&#39;, &#39;hero&#39; ),
+      x = c(10, 8, 6, 5, 6, 5, 2, 1),
+      y = c(0, 1, 3, 5, 8, 8, 10, 9),
+      z = c(1,3,5,2,7,8,4,3))</code></pre>
+<p>Just like the plot above, we can plot the words in three dimensions, using <a href="https://plotly.com/r/">Plotly</a>:</p>
+<pre class="r"><code>library(plotly)
+
+plot_ly(data = word_vectors_3d, x =  ~x, y = ~y,z =  ~z, text = ~word) %&gt;% add_markers() %&gt;% layout(title = &quot;3D Representation of Word Vectors&quot;)</code></pre>
+<div id="htmlwidget-1" style="width:672px;height:480px;" class="plotly html-widget"></div>
+<script type="application/json" data-for="htmlwidget-1">{"x":{"visdat":{"de912a6ae781":["function () ","plotlyVisDat"]},"cur_data":"de912a6ae781","attrs":{"de912a6ae781":{"x":{},"y":{},"z":{},"text":{},"alpha_stroke":1,"sizes":[10,100],"spans":[1,20],"type":"scatter3d","mode":"markers","inherit":true}},"layout":{"margin":{"b":40,"l":60,"t":25,"r":10},"title":"3D Representation of Word Vectors","scene":{"xaxis":{"title":"x"},"yaxis":{"title":"y"},"zaxis":{"title":"z"}},"hovermode":"closest","showlegend":false},"source":"A","config":{"showSendToCloud":false},"data":[{"x":[10,8,6,5,6,5,2,1],"y":[0,1,3,5,8,8,10,9],"z":[1,3,5,2,7,8,4,3],"text":["crufts","feed","cat","dog","mouse","rabbit","cape","hero"],"type":"scatter3d","mode":"markers","marker":{"color":"rgba(31,119,180,1)","line":{"color":"rgba(31,119,180,1)"}},"error_y":{"color":"rgba(31,119,180,1)"},"error_x":{"color":"rgba(31,119,180,1)"},"line":{"color":"rgba(31,119,180,1)"},"frame":null}],"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.2,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
+<p>You can start to understand how the words now cluster together in the 3D plot: <em>rabbit</em> and <em>mouse</em> are still clustered together, but whereas before both were closer to <em>dog</em> than to <em>cat</em>, now it looks like they are fairly equidistant from both. We can use the same formula as above to calculate these distances, just by adding the z coordinates to the pointA and pointB vectors:</p>
+<pre class="r"><code>pointA = c(word_vectors_3d$x[word_vectors_3d$word == &#39;dog&#39;], word_vectors_3d$y[word_vectors_3d$word == &#39;dog&#39;], word_vectors_3d$z[word_vectors_3d$word == &#39;dog&#39;])
+pointB = c(word_vectors_3d$x[word_vectors_3d$word == &#39;mouse&#39;], word_vectors_3d$y[word_vectors_3d$word == &#39;mouse&#39;], word_vectors_3d$z[word_vectors_3d$word == &#39;mouse&#39;])
+
+euc.dist(pointA, pointB)</code></pre>
+<pre><code>## [1] 5.91608</code></pre>
+<pre class="r"><code>pointA = c(word_vectors_3d$x[word_vectors_3d$word == &#39;cat&#39;], word_vectors_3d$y[word_vectors_3d$word == &#39;cat&#39;], word_vectors_3d$z[word_vectors_3d$word == &#39;cat&#39;])
+pointB = c(word_vectors_3d$x[word_vectors_3d$word == &#39;mouse&#39;], word_vectors_3d$y[word_vectors_3d$word == &#39;mouse&#39;], word_vectors_3d$z[word_vectors_3d$word == &#39;mouse&#39;])
+
+euc.dist(pointA, pointB)</code></pre>
+<pre><code>## [1] 5.385165</code></pre>
+<p>The nice thing about the method is that while my brain starts to hurt when I think about more than three dimensions, the maths behind it doesn’t care: you can just keep plugging in longer and longer vectors and it’ll continue to calculate the distances as long as they are the same length. This means you can use this same formula not just when you have x and y coordinates, but also z, a, b, c, d, and so on for as long as you like. This is often called ‘representing words in multi-dimensional euclidean space’, or something similar which sounds great on grant applications but it’s really just doing some plotting and measuring distances. Which means that if you represent all the words in a corpus as a long vector (series of coordinates), you can quickly measure the distance between any two.</p>
+</div>
+<div id="querying-the-vectors-using-arithmetic" class="section level3">
+<h3>Querying the Vectors Using Arithmetic</h3>
+<p>In a large corpus with a properly-constructed vector representation, the semantic relationships between the words start to represent some sort of meaning between words and concepts in the underlying source text. It’s quite easy to perform arithmetic on vectors: you can add, subtract, divide and multiply the vectors together to get new ones, and then find the closest words to those.</p>
+<p>Here, I’ve created a new vector, which is pointA - pointB (<em>dog</em> minus <em>mouse</em>). Then loop through each vector and calculate the distance from this vector to each word in the dataset:</p>
+<pre class="r"><code>pointC = pointA - pointB
+
+df_for_results = tibble()
+for(i in 1:8){
+  
+  pointA = c(word_vectors_3d$x[i], word_vectors_3d$y[i], word_vectors_3d$z[i])
+  u = tibble(dist = euc.dist(pointC, pointA), word = word_vectors_3d$word[i])
+  df_for_results = rbind(df_for_results, u)
+}
+
+df_for_results %&gt;% arrange(dist)</code></pre>
+<pre><code>## # A tibble: 8 x 2
+##    dist word  
+##   &lt;dbl&gt; &lt;chr&gt; 
+## 1  0    mouse 
+## 2  1.41 rabbit
+## 3  5.39 cat   
+## 4  5.39 cape  
+## 5  5.92 dog   
+## 6  6.48 hero  
+## 7  8.31 feed  
+## 8 10.8  crufts</code></pre>
+<p>The closest to <em>dog</em> minus <em>mouse</em> is <em>hero</em>, with this vector representation. In this very tiny dataset this is meaningless, but with a large trained set, as will be shown below, it can give really interesting results.</p>
+</div>
+<div id="from-vectors-to-word-embeddings" class="section level3">
+<h3>From Vectors to Word Embeddings</h3>
+<p>These vectors are also known as word embeddings. Real algorithms base the vectors on more sophisticated metrics than that I used above. Some, such as <a href="https://nlp.stanford.edu/projects/glove/">GloVe</a> record co-occurrence probabilities (the likelihood of every pair of words in a corpus to co-occur within a set ‘window’ of words either side), using a neural network, and pre-trained over enormous corpora of text. The resulting vectors are often used to represent the relationships between modern meanings of words, to <a href="https://dh2017.adho.org/abstracts/582/582.pdf">track semantic changes over time</a>, or to understand the history of <a href="https://ccdkconceptlab.wordpress.com/">concepts</a>, though it’s worth pointing out they’re only as representative as the corpus used (many use sources such as Wikipedia, or Reddit, mostly produced by white men and so there’s a danger of biases towards those groups).</p>
+<p>Word embeddings are often critiqued as reflecting or propogating bias (I highly recommend Kaspar Beelen’s <a href="https://lab.kb.nl/about-us/blog/introduction-gender-bias-historical-newspapers">post</a> and <a href="https://github.com/KBNLresearch/WordEmbeddingPlayground">tools</a> to understand more about this) of their source texts. The source used here is a corpus consisting of the printed summaries of the Calendars of State Papers, which I’ve described in detail <a href="https://networkingarchives.github.io/blog/2021/04/14/text-mining/">here</a>. As such it is likely highly biased, but if the purpose of an analysis is historical, for example to understand how a concept was represented at a given time, by a specific group, in a particular body of text, the biases captured by word embeddings can be seen as a research strength rather than a weakness. The data is in no way representative of early modern text more generally, and, what’s more, the summaries were written in the 19th century and so will reflect what editors at the time thought was important. In these two ways, the corpus will reproduce a very particular wordview of a very specific group, at a very specific time. Because of this, can use the embeddings to get an idea of how certain words or ideas were semantically linked, <em>specifically in the corpus of calendar abstracts.</em> The data will not show us how early modern concepts were related, but it might show conceptual changes in words within the information apparatus of the state.</p>
+<p>The following instructions are adapted from the <a href="http://text2vec.org/glove.html">project vignette</a> and <a href="https://m-clark.github.io/text-analysis-with-R/word-embeddings.html">this tutorial</a>. It uses the package text2vec, through which it’s possible to train the GloVe algorithm using R. First, tokenise all the abstract text and remove very common words called stop words:</p>
+<pre class="r"><code>library(text2vec)
+library(tidytext)
+library(textstem)
+data(&quot;stop_words&quot;)</code></pre>
+<p>Next, load and pre-process the abstract text:</p>
+<pre class="r"><code>spo_raw = read_delim(&#39;/Users/Yann/Documents/MOST RECENT DATA/fromto_all_place_mapped_stuart_sorted&#39;, delim = &#39;\t&#39;, col_names = F )
+spo_mapped_people = read_delim(&#39;/Users/Yann/Downloads/people_docs_stuart_200421&#39;, delim = &#39;\t&#39;, col_names = F)
+
+load(&#39;/Users/Yann/Documents/non-Github/spo_data/g&#39;)
+g = g %&gt;% group_by(path) %&gt;% summarise(value = paste0(value, collapse = &quot;&lt;br&gt;&quot;))
+
+spo_raw = spo_raw %&gt;%
+mutate(X7 = str_replace(X7, &quot;spo&quot;, &quot;SPO&quot;)) %&gt;%
+separate(X7, into = c(&#39;Y1&#39;, &#39;Y2&#39;, &#39;Y3&#39;), sep = &#39;/&#39;) %&gt;%
+mutate(fullpath = paste0(&quot;/Users/Yann/Documents/non-Github/spo_xml/&quot;, Y1, &#39;/XML/&#39;, Y2,&quot;/&quot;, Y3)) %&gt;% mutate(uniquecode = paste0(&quot;Z&quot;, 1:nrow(spo_raw), &quot;Z&quot;))
+
+withtext = left_join(spo_raw, g, by = c(&#39;fullpath&#39; = &#39;path&#39;)) %&gt;%
+left_join(spo_mapped_people %&gt;% dplyr::select(X1, from_name = X2), by = c(&#39;X1&#39; = &#39;X1&#39;))%&gt;%
+left_join(spo_mapped_people %&gt;% dplyr::select(X1, to_name = X2), by = c(&#39;X2&#39; = &#39;X1&#39;)) </code></pre>
+<p>Tokenize the text using the function <code>unnest_tokens()</code> from the <a href="https://cran.r-project.org/web/packages/tidytext/vignettes/tidytext.html">Tidytext</a> library, remove stop words, lemmatize the text (reduce the words to their stem) using <a href="https://cran.r-project.org/web/packages/textstem/index.html">textstem</a>, and filter out any words which are actually just numbers. <code>unnest_tokens</code> makes a new dataframe based on the inputted text, with one word per row, which can then be counted, sorted, filtered and so forth.</p>
+<pre class="r"><code>words = withtext %&gt;% 
+  ungroup()  %&gt;% 
+  select(document = X5, value, date = X3) %&gt;%
+  unnest_tokens(word, value) %&gt;% anti_join(stop_words)%&gt;% 
+  mutate(word = lemmatize_words(word)) %&gt;% filter(!str_detect(word, &quot;[0-9]{1,}&quot;))</code></pre>
+<p>Create a ‘vocabulary’ with the word2vec package, which is just a list of each word found in the dataset and the times they occur, and ‘prune’ it to only words which occur at least five times.</p>
+<pre class="r"><code>words_ls = list(words$word)
+
+it = itoken(words_ls, progressbar = FALSE)
+
+vocab = create_vocabulary(it)
+
+vocab = prune_vocabulary(vocab, term_count_min = 5)</code></pre>
+<p>With the vocabulary, next construct a ‘term co-occurence matrix’: this is a matrix of rows and columns, counting all the times each word co-occurs with every other word, within a window which can be set with the argument <code>skip_grams_window =</code></p>
+<pre class="r"><code>vectorizer = vocab_vectorizer(vocab)
+
+# use window of 10 for context words
+tcm = create_tcm(it, vectorizer, skip_grams_window = 10)</code></pre>
+<p>Now use the GloVe algorithm to train the model and produce the vectors, with a set number of iterations: here we’ve used 20, which seems to give good results. It can be quite slow, but as it’s a relatively small dataset (in comparison to something like the entire English wikipedia), it shouldn’t take too long to run - a couple of minutes for 20 iterations.</p>
+<pre class="r"><code>glove = GlobalVectors$new(rank = 100, x_max = 10)
+
+wv_main = glove$fit_transform(tcm, n_iter = 20, convergence_tol = 0.00001)</code></pre>
+<pre><code>## INFO  [14:33:52.149] epoch 1, loss 0.1507 
+## INFO  [14:34:14.703] epoch 2, loss 0.0991 
+## INFO  [14:34:37.552] epoch 3, loss 0.0877 
+## INFO  [14:35:00.521] epoch 4, loss 0.0816 
+## INFO  [14:35:23.633] epoch 5, loss 0.0777 
+## INFO  [14:35:46.241] epoch 6, loss 0.0749 
+## INFO  [14:36:09.263] epoch 7, loss 0.0727 
+## INFO  [14:36:32.052] epoch 8, loss 0.0710 
+## INFO  [14:36:54.664] epoch 9, loss 0.0696 
+## INFO  [14:37:17.249] epoch 10, loss 0.0684 
+## INFO  [14:37:39.803] epoch 11, loss 0.0674 
+## INFO  [14:38:02.554] epoch 12, loss 0.0666 
+## INFO  [14:38:25.339] epoch 13, loss 0.0658 
+## INFO  [14:38:48.060] epoch 14, loss 0.0652 
+## INFO  [14:39:10.665] epoch 15, loss 0.0646 
+## INFO  [14:39:33.385] epoch 16, loss 0.0641 
+## INFO  [14:39:56.206] epoch 17, loss 0.0636 
+## INFO  [14:40:19.104] epoch 18, loss 0.0632 
+## INFO  [14:40:41.794] epoch 19, loss 0.0628 
+## INFO  [14:41:04.779] epoch 20, loss 0.0625</code></pre>
+<p>GloVe results in two sets of word vectors. The authors of the GloVe package suggest that combining both results in higher-quality embeddings:</p>
+<pre class="r"><code>wv_context = glove$components
+
+
+
+# Either word-vectors matrices could work, but the developers of the technique
+# suggest the sum/mean may work better
+word_vectors = wv_main + t(wv_context)</code></pre>
+</div>
+<div id="results" class="section level3">
+<h3>Results</h3>
+<p>The next step was to write a small function which calculates and displays the closest words to a given word, to make it easier to query the results. There’s an important change here: instead of using the euclidean distance formula above, distance is calculated using the <em>cosine similarity</em>, which measures the angular distance between the words (this is better because it <a href="https://cmry.github.io/notes/euclidean-v-cosine#:~:text=While%20cosine%20looks%20at%20the,though%20they%20were%20further%20away.">corrects for one word appearing many times and another appearing very infrequently</a>).</p>
+<pre class="r"><code>ten_closest_words = function(word){
+
+word_result = word_vectors[word, , drop = FALSE] 
+
+cos_sim = sim2(x = word_vectors, y = word_result, method = &quot;cosine&quot;, norm = &quot;l2&quot;)
+
+
+head(sort(cos_sim[,1], decreasing = TRUE), 20)
+
+}</code></pre>
+<p>The function takes a single word as an argument and returns the twenty closest word vectors, by cosine distance. What are the closest in useage to <em>king</em>?</p>
+<pre class="r"><code>ten_closest_words(&#39;king&#39;)</code></pre>
+<pre><code>##      king    king&#39;s   majesty     queen majesty&#39;s    prince   england   declare 
+## 1.0000000 0.8177222 0.8105912 0.7352217 0.7151208 0.7126855 0.7119099 0.7046366 
+##       seq      late      duke    please      lord   promise       cpg     grant 
+## 0.7032410 0.7006746 0.7004456 0.7000613 0.6895407 0.6870112 0.6819107 0.6768820 
+##    intend        id      pray    favour 
+## 0.6747779 0.6738966 0.6726993 0.6707538</code></pre>
+<p>Unsurprisingly, a word that is often interchangeable with <em>King</em>, <em>Majesty</em>, is the closest, followed by <em>Queen</em> - also obviously interchangeable with King, depending on the circumstances.</p>
+<p>Word embeddings are often used to understand different and changing <a href="https://lab.kb.nl/about-us/blog/introduction-gender-bias-historical-newspapers">gender representations</a>. How are gendered words represented in the State Papers abstracts? First of all, <em>wife</em>:</p>
+<pre class="r"><code>ten_closest_words(&#39;wife&#39;)</code></pre>
+<pre><code>##      wife   husband     child    sister    mother      lady   brother  daughter 
+## 1.0000000 0.8135368 0.7680603 0.7517228 0.7248175 0.7231804 0.7188545 0.7139700 
+##     marry    father     widow       son    family   servant      life      live 
+## 0.6806173 0.6671037 0.6567243 0.6479807 0.6139687 0.6107722 0.6105448 0.6018107 
+##    friend  writer&#39;s     woman       die 
+## 0.5981722 0.5951051 0.5904939 0.5851097</code></pre>
+<p>It seems that <em>wife</em> is most similar to other words relating to family. What about <em>husband</em>?</p>
+<pre class="r"><code>ten_closest_words(&#39;husband&#39;)</code></pre>
+<pre><code>##      husband         wife        child        widow         lady       sister 
+##    1.0000000    0.8135368    0.7335813    0.6727104    0.6109208    0.6007251 
+##       mother      brother     daughter      servant    husband&#39;s          son 
+##    0.5964263    0.5954335    0.5932350    0.5907590    0.5786800    0.5739544 
+##        marry        woman       father          die         debt       family 
+##    0.5711938    0.5702857    0.5698491    0.5679301    0.5675128    0.5576354 
+##     petition petitioner&#39;s 
+##    0.5541463    0.5466416</code></pre>
+<p><em>Husband</em> is mostly similar but with some interesting different associations: <em>widow</em>, <em>die</em>, <em>petition</em>, <em>debt</em>, and <em>prisoner</em>, reflecting the fact that there is a large group of petitions in the State Papers written by women looking for pardons or clemency for their husbands, particularly following the Monmouth Rebellion in 1683.</p>
+<p>Looking at the closest words to place names gives some interesting associations. <em>Amsterdam</em> is associated with terms related to shipping and trade:</p>
+<pre class="r"><code>ten_closest_words(&#39;amsterdam&#39;)</code></pre>
+<pre><code>##   amsterdam   rotterdam        lade    bordeaux     hamburg      richly 
+##   1.0000000   0.7889888   0.6468717   0.6042075   0.5822187   0.5647650 
+##     holland     zealand       dutch       prize    merchant      vessel 
+##   0.5594555   0.5447143   0.5356518   0.5309154   0.5261446   0.5255347 
+##      arrive       flush      ostend        ship      london  copenhagen 
+##   0.5245304   0.5159787   0.5138438   0.5103055   0.5003312   0.4997833 
+## merchantmen       cadiz 
+##   0.4943865   0.4898490</code></pre>
+<p>Whereas <em>Rome</em> is very much associated with religion and ecclesiastical politics:</p>
+<pre class="r"><code>ten_closest_words(&#39;rome&#39;)</code></pre>
+<pre><code>##       rome       pope     jesuit      friar     priest     naples   catholic 
+##  1.0000000  0.6087960  0.5907551  0.5596762  0.5415235  0.5409374  0.5321532 
+##      spain     venice   cardinal     nuncio    germany      italy     pope&#39;s 
+##  0.5181883  0.5172574  0.5070520  0.4870522  0.4813966  0.4804191  0.4593149 
+##   religion      paris ambassador     tyrone   florence  archdukes 
+##  0.4531869  0.4531597  0.4467086  0.4433518  0.4343476  0.4239177</code></pre>
+</div>
+<div id="more-complex-vector-tasks" class="section level3">
+<h3>More Complex Vector Tasks</h3>
+<p>As well as finding the most similar words, we can also perform arithmetic on the vectors. What are the closest words to <em>book</em> <strong>plus</strong> <em>news</em>?</p>
+<pre class="r"><code>sum = word_vectors[&quot;book&quot;, , drop = F] + 
+ word_vectors[&quot;news&quot;, , drop = F]
+
+cos_sim_test = sim2(x = word_vectors, y = sum, method = &quot;cosine&quot;, norm = &quot;l2&quot;)
+
+head(sort(cos_sim_test[,1], decreasing = T), 20)</code></pre>
+<pre><code>##       news       book     letter       send    account       hear    enclose 
+##  0.8022483  0.8007200  0.7002376  0.6938228  0.6865210  0.6698032  0.6659100 
+##     return      write      print        day       hope williamson       post 
+##  0.6578209  0.6575487  0.6477301  0.6463922  0.6396193  0.6342159  0.6332963 
+##      bring     expect       hand    receive     report       note 
+##  0.6306521  0.6289672  0.6241833  0.6197365  0.6183798  0.6177360</code></pre>
+<p>This is a way of finding semantically-linked analogies beyond simply two equivalent words. So, for example, <em>Paris</em> - <em>France</em> + <em>Germany</em> should equal to <em>Berlin</em>, because Berlin is like the Paris of France. It’s the equivalent of those primary school exercises ‘Paris is to France as ____ is to Germany’. As the word vectors are numbers, they can be added and subtracted. What does the State Papers corpus think is the Paris of Germany?</p>
+<pre class="r"><code>test = word_vectors[&quot;paris&quot;, , drop = F] -
+  word_vectors[&quot;france&quot;, , drop = F] +
+  word_vectors[&quot;germany&quot;, , drop = F]
+  
+#+
+ # shakes_word_vectors[&quot;letter&quot;, , drop = F]
+
+cos_sim_test = sim2(x = word_vectors, y = test, method = &quot;cosine&quot;, norm = &quot;l2&quot;)
+
+head(sort(cos_sim_test[,1], decreasing = T), 10)</code></pre>
+<pre><code>##       germany         paris      brussels            ps advertisement 
+##     0.6135925     0.5852843     0.5315038     0.4704347     0.4452859 
+##     frankfort         hague       edmonds           n.s       curtius 
+##     0.4311039     0.4200639     0.4137443     0.4008544     0.4005619</code></pre>
+<p>After Germany and Paris, the most similar to Paris - France + Germany is Brussels: not the correct answer, but a close enough guess!</p>
+<p>We can try other analogies: pen - letter + book (pen is to letter as _____ is to book) should in theory give some word related to printing and book production such as print, or press, or maybe type:</p>
+<pre class="r"><code>test = word_vectors[&quot;pen&quot;, , drop = F] -
+  word_vectors[&quot;letter&quot;, , drop = F] +
+    word_vectors[&quot;book&quot;, , drop = F]
+  
+cos_sim_test = sim2(x = word_vectors, y = test, method = &quot;cosine&quot;, norm = &quot;l2&quot;)
+
+head(sort(cos_sim_test[,1], decreasing = T), 20)</code></pre>
+<pre><code>##           pen          book storekeeper&#39;s    unlicensed     bywater&#39;s 
+##     0.5719533     0.5393821     0.5175164     0.4966075     0.4912080 
+##      pamphlet           ink        pareus      waterton         aloft 
+##     0.4897688     0.4665493     0.4471487     0.4383422     0.4297689 
+##  schismatical        stitch     catalogue    humphrey&#39;s       writing 
+##     0.4283230     0.4281081     0.4275299     0.4270771     0.4262785 
+## promiscuously        quires        closet      crucifix         sheet 
+##     0.4225891     0.4177962     0.4156617     0.4143025     0.4137616</code></pre>
+<p>Not bad - printer is in the top 20! The closest is ink, plus some other book-production-related words like stitch, ream, and pamphlet. Though some of these words can also be associated with manuscript production, we <em>could</em> be generous and say that they are sort of to a book as a pen is to a letter!</p>
+</div>
+<div id="change-in-semantic-relations-over-time" class="section level3">
+<h3>Change in Semantic Relations Over Time</h3>
+<p>Another, potentially more interesting way to use a longitudinal corpus like this is to look for change in semantic meaning over time. This can be done by splitting the data into temporally distinct sections, and comparing word associations across them.</p>
+<p>First, divide the text into four separate sections, one for each reign:</p>
+<pre class="r"><code>library(lubridate)
+james_i = withtext %&gt;% 
+  mutate(year = year(ymd(X4))) %&gt;% 
+  filter(year %in% 1603:1624) %&gt;% 
+  ungroup()  %&gt;% 
+  select(document = X5, value, date = X3) %&gt;%
+  unnest_tokens(word, value) %&gt;% 
+  anti_join(stop_words) %&gt;% 
+  mutate(word = lemmatize_words(word)) %&gt;% filter(!str_detect(word, &quot;[0-9]{1,}&quot;))
+
+charles_i = withtext %&gt;% 
+  mutate(year = year(ymd(X4))) %&gt;% 
+  filter(year %in% 1625:1648) %&gt;% 
+  ungroup()  %&gt;% 
+  select(document = X5, value, date = X3) %&gt;%
+  unnest_tokens(word, value) %&gt;% anti_join(stop_words)%&gt;% 
+  mutate(word = lemmatize_words(word)) %&gt;% filter(!str_detect(word, &quot;[0-9]{1,}&quot;))
+
+commonwealth = withtext %&gt;% 
+  mutate(year = year(ymd(X4))) %&gt;% 
+  filter(year %in% 1649:1659) %&gt;% 
+  ungroup()  %&gt;% 
+  select(document = X5, value, date = X3) %&gt;%
+  unnest_tokens(word, value) %&gt;% anti_join(stop_words)%&gt;% 
+  mutate(word = lemmatize_words(word)) %&gt;% filter(!str_detect(word, &quot;[0-9]{1,}&quot;))
+
+charles_ii = withtext %&gt;% 
+  mutate(year = year(ymd(X4))) %&gt;% 
+  filter(year %in% 1660:1684) %&gt;% 
+  ungroup()  %&gt;% 
+  select(document = X5, value, date = X3) %&gt;%
+  unnest_tokens(word, value) %&gt;% anti_join(stop_words)%&gt;% 
+  mutate(word = lemmatize_words(word)) %&gt;% filter(!str_detect(word, &quot;[0-9]{1,}&quot;))
+
+james_ii_w_m_ann = withtext %&gt;% 
+  mutate(year = year(ymd(X4))) %&gt;% 
+  filter(year %in% 1685:1714) %&gt;% 
+  ungroup()  %&gt;% 
+  select(document = X5, value, date = X3) %&gt;%
+  unnest_tokens(word, value) %&gt;% anti_join(stop_words) %&gt;% 
+  mutate(word = lemmatize_words(word)) %&gt;% filter(!str_detect(word, &quot;[0-9]{1,}&quot;))</code></pre>
+<p>Now run the same scripts as above, on each of these sections:</p>
+<pre class="r"><code>james_i_words_ls = list(james_i$word)
+it = itoken(james_i_words_ls, progressbar = FALSE)
+james_i_vocab = create_vocabulary(it)
+james_i_vocab = prune_vocabulary(james_i_vocab, term_count_min = 5)
+
+vectorizer = vocab_vectorizer(james_i_vocab)
+
+# use window of 10 for context words
+james_i_tcm = create_tcm(it, vectorizer, skip_grams_window = 10)
+
+james_i_glove = GlobalVectors$new(rank = 100, x_max = 10)
+
+james_i_wv_main = james_i_glove$fit_transform(james_i_tcm, n_iter = 20, convergence_tol = 0.00001)</code></pre>
+<pre><code>## INFO  [14:41:43.864] epoch 1, loss 0.1523 
+## INFO  [14:41:49.539] epoch 2, loss 0.0919 
+## INFO  [14:41:55.057] epoch 3, loss 0.0783 
+## INFO  [14:42:00.637] epoch 4, loss 0.0711 
+## INFO  [14:42:06.157] epoch 5, loss 0.0664 
+## INFO  [14:42:11.731] epoch 6, loss 0.0630 
+## INFO  [14:42:17.411] epoch 7, loss 0.0603 
+## INFO  [14:42:23.078] epoch 8, loss 0.0582 
+## INFO  [14:42:28.986] epoch 9, loss 0.0565 
+## INFO  [14:42:34.595] epoch 10, loss 0.0551 
+## INFO  [14:42:40.130] epoch 11, loss 0.0539 
+## INFO  [14:42:45.749] epoch 12, loss 0.0528 
+## INFO  [14:42:51.318] epoch 13, loss 0.0519 
+## INFO  [14:42:56.928] epoch 14, loss 0.0511 
+## INFO  [14:43:02.448] epoch 15, loss 0.0504 
+## INFO  [14:43:07.986] epoch 16, loss 0.0498 
+## INFO  [14:43:13.553] epoch 17, loss 0.0492 
+## INFO  [14:43:19.060] epoch 18, loss 0.0487 
+## INFO  [14:43:24.607] epoch 19, loss 0.0482 
+## INFO  [14:43:30.206] epoch 20, loss 0.0478</code></pre>
+<pre class="r"><code>james_i_wv_context = james_i_glove$components
+
+james_i_word_vectors = james_i_wv_main + t(james_i_wv_context)</code></pre>
+<pre class="r"><code>charles_i_words_ls = list(charles_i$word)
+it = itoken(charles_i_words_ls, progressbar = FALSE)
+charles_i_vocab = create_vocabulary(it)
+charles_i_vocab = prune_vocabulary(charles_i_vocab, term_count_min = 5)
+
+vectorizer = vocab_vectorizer(charles_i_vocab)
+
+# use window of 10 for context words
+charles_i_tcm = create_tcm(it, vectorizer, skip_grams_window = 10)
+
+charles_i_glove = GlobalVectors$new(rank = 100, x_max = 10)
+
+charles_i_wv_main = charles_i_glove$fit_transform(charles_i_tcm, n_iter = 20, convergence_tol = 0.00001)</code></pre>
+<pre><code>## INFO  [14:43:53.928] epoch 1, loss 0.1505 
+## INFO  [14:44:00.855] epoch 2, loss 0.0916 
+## INFO  [14:44:07.849] epoch 3, loss 0.0789 
+## INFO  [14:44:14.816] epoch 4, loss 0.0721 
+## INFO  [14:44:21.726] epoch 5, loss 0.0676 
+## INFO  [14:44:28.652] epoch 6, loss 0.0644 
+## INFO  [14:44:35.547] epoch 7, loss 0.0619 
+## INFO  [14:44:42.426] epoch 8, loss 0.0599 
+## INFO  [14:44:49.358] epoch 9, loss 0.0582 
+## INFO  [14:44:56.229] epoch 10, loss 0.0568 
+## INFO  [14:45:03.211] epoch 11, loss 0.0557 
+## INFO  [14:45:10.157] epoch 12, loss 0.0547 
+## INFO  [14:45:17.075] epoch 13, loss 0.0538 
+## INFO  [14:45:23.994] epoch 14, loss 0.0530 
+## INFO  [14:45:30.845] epoch 15, loss 0.0524 
+## INFO  [14:45:37.754] epoch 16, loss 0.0518 
+## INFO  [14:45:44.649] epoch 17, loss 0.0512 
+## INFO  [14:45:51.568] epoch 18, loss 0.0507 
+## INFO  [14:45:58.520] epoch 19, loss 0.0502 
+## INFO  [14:46:05.504] epoch 20, loss 0.0498</code></pre>
+<pre class="r"><code>charles_i_wv_context = charles_i_glove$components
+
+charles_i_word_vectors = charles_i_wv_main + t(charles_i_wv_context)</code></pre>
+<pre class="r"><code>commonwealth_words_ls = list(commonwealth$word)
+it = itoken(commonwealth_words_ls, progressbar = FALSE)
+commonwealth_vocab = create_vocabulary(it)
+commonwealth_vocab = prune_vocabulary(commonwealth_vocab, term_count_min = 5)
+
+vectorizer = vocab_vectorizer(commonwealth_vocab)
+
+# use window of 10 for context words
+commonwealth_tcm = create_tcm(it, vectorizer, skip_grams_window = 10)
+
+commonwealth_glove = GlobalVectors$new(rank = 100, x_max = 10)
+
+commonwealth_wv_main = commonwealth_glove$fit_transform(commonwealth_tcm, n_iter = 20, convergence_tol = 0.00001)</code></pre>
+<pre><code>## INFO  [14:46:22.417] epoch 1, loss 0.1695 
+## INFO  [14:46:25.367] epoch 2, loss 0.0946 
+## INFO  [14:46:28.308] epoch 3, loss 0.0789 
+## INFO  [14:46:31.251] epoch 4, loss 0.0708 
+## INFO  [14:46:34.185] epoch 5, loss 0.0655 
+## INFO  [14:46:37.125] epoch 6, loss 0.0617 
+## INFO  [14:46:40.063] epoch 7, loss 0.0587 
+## INFO  [14:46:43.000] epoch 8, loss 0.0563 
+## INFO  [14:46:45.933] epoch 9, loss 0.0544 
+## INFO  [14:46:48.866] epoch 10, loss 0.0527 
+## INFO  [14:46:51.823] epoch 11, loss 0.0513 
+## INFO  [14:46:54.845] epoch 12, loss 0.0501 
+## INFO  [14:46:57.898] epoch 13, loss 0.0491 
+## INFO  [14:47:00.936] epoch 14, loss 0.0482 
+## INFO  [14:47:03.940] epoch 15, loss 0.0474 
+## INFO  [14:47:07.453] epoch 16, loss 0.0466 
+## INFO  [14:47:10.495] epoch 17, loss 0.0460 
+## INFO  [14:47:13.543] epoch 18, loss 0.0454 
+## INFO  [14:47:16.539] epoch 19, loss 0.0448 
+## INFO  [14:47:19.550] epoch 20, loss 0.0443</code></pre>
+<pre class="r"><code>commonwealth_wv_context = commonwealth_glove$components
+
+# dim(shakes_wv_context)
+
+# Either word-vectors matrices could work, but the developers of the technique
+# suggest the sum/mean may work better
+commonwealth_word_vectors = commonwealth_wv_main + t(commonwealth_wv_context)</code></pre>
+<pre class="r"><code>charles_ii_words_ls = list(charles_ii$word)
+it = itoken(charles_ii_words_ls, progressbar = FALSE)
+charles_ii_vocab = create_vocabulary(it)
+charles_ii_vocab = prune_vocabulary(charles_ii_vocab, term_count_min = 5)
+
+vectorizer = vocab_vectorizer(charles_ii_vocab)
+
+# use window of 10 for context words
+charles_ii_tcm = create_tcm(it, vectorizer, skip_grams_window = 10)
+
+charles_ii_glove = GlobalVectors$new(rank = 100, x_max = 10)
+
+charles_ii_wv_main = charles_ii_glove$fit_transform(charles_ii_tcm, n_iter = 20, convergence_tol = 0.00001)</code></pre>
+<pre><code>## INFO  [14:47:49.796] epoch 1, loss 0.1464 
+## INFO  [14:48:00.251] epoch 2, loss 0.0904 
+## INFO  [14:48:10.819] epoch 3, loss 0.0786 
+## INFO  [14:48:21.365] epoch 4, loss 0.0724 
+## INFO  [14:48:31.924] epoch 5, loss 0.0684 
+## INFO  [14:48:42.493] epoch 6, loss 0.0655 
+## INFO  [14:48:52.952] epoch 7, loss 0.0633 
+## INFO  [14:49:03.813] epoch 8, loss 0.0615 
+## INFO  [14:49:14.387] epoch 9, loss 0.0601 
+## INFO  [14:49:25.185] epoch 10, loss 0.0589 
+## INFO  [14:49:36.102] epoch 11, loss 0.0579 
+## INFO  [14:49:47.181] epoch 12, loss 0.0570 
+## INFO  [14:49:57.817] epoch 13, loss 0.0562 
+## INFO  [14:50:08.585] epoch 14, loss 0.0555 
+## INFO  [14:50:18.848] epoch 15, loss 0.0549 
+## INFO  [14:50:29.110] epoch 16, loss 0.0544 
+## INFO  [14:50:39.406] epoch 17, loss 0.0539 
+## INFO  [14:50:49.701] epoch 18, loss 0.0535 
+## INFO  [14:51:00.145] epoch 19, loss 0.0531 
+## INFO  [14:51:10.411] epoch 20, loss 0.0527</code></pre>
+<pre class="r"><code>charles_ii_wv_context = charles_ii_glove$components
+
+# dim(shakes_wv_context)
+
+# Either word-vectors matrices could work, but the developers of the technique
+# suggest the sum/mean may work better
+charles_ii_word_vectors = charles_ii_wv_main + t(charles_ii_wv_context)</code></pre>
+<pre class="r"><code>james_ii_w_m_ann_words_ls = list(james_ii_w_m_ann$word)
+it = itoken(james_ii_w_m_ann_words_ls, progressbar = FALSE)
+james_ii_w_m_ann_vocab = create_vocabulary(it)
+james_ii_w_m_ann_vocab = prune_vocabulary(james_ii_w_m_ann_vocab, term_count_min = 5)
+
+vectorizer = vocab_vectorizer(james_ii_w_m_ann_vocab)
+
+# use window of 10 for context words
+james_ii_w_m_ann_tcm = create_tcm(it, vectorizer, skip_grams_window = 10)
+
+james_ii_w_m_ann_glove = GlobalVectors$new(rank = 100, x_max = 10)
+
+james_ii_w_m_ann_wv_main = james_ii_w_m_ann_glove$fit_transform(james_ii_w_m_ann_tcm, n_iter = 20, convergence_tol = 0.00001)</code></pre>
+<pre><code>## INFO  [14:51:35.394] epoch 1, loss 0.1594 
+## INFO  [14:51:39.937] epoch 2, loss 0.0926 
+## INFO  [14:51:44.553] epoch 3, loss 0.0788 
+## INFO  [14:51:49.111] epoch 4, loss 0.0714 
+## INFO  [14:51:53.655] epoch 5, loss 0.0665 
+## INFO  [14:51:58.203] epoch 6, loss 0.0629 
+## INFO  [14:52:02.820] epoch 7, loss 0.0601 
+## INFO  [14:52:07.513] epoch 8, loss 0.0579 
+## INFO  [14:52:12.080] epoch 9, loss 0.0561 
+## INFO  [14:52:16.643] epoch 10, loss 0.0546 
+## INFO  [14:52:21.239] epoch 11, loss 0.0533 
+## INFO  [14:52:25.989] epoch 12, loss 0.0522 
+## INFO  [14:52:30.580] epoch 13, loss 0.0512 
+## INFO  [14:52:35.115] epoch 14, loss 0.0504 
+## INFO  [14:52:39.664] epoch 15, loss 0.0496 
+## INFO  [14:52:44.202] epoch 16, loss 0.0489 
+## INFO  [14:52:48.739] epoch 17, loss 0.0483 
+## INFO  [14:52:53.280] epoch 18, loss 0.0478 
+## INFO  [14:52:57.868] epoch 19, loss 0.0472 
+## INFO  [14:53:02.430] epoch 20, loss 0.0468</code></pre>
+<pre class="r"><code>james_ii_w_m_ann_wv_context = james_ii_w_m_ann_glove$components
+
+# dim(shakes_wv_context)
+
+# Either word-vectors matrices could work, but the developers of the technique
+# suggest the sum/mean may work better
+james_ii_w_m_ann_word_vectors = james_ii_w_m_ann_wv_main + t(james_ii_w_m_ann_wv_context)</code></pre>
+<p>Write a function to query the results as we did above, this time with two arguments, so we can specify both the word and the relevant reign:</p>
+<pre class="r"><code>top_ten_function = function(word, period){
+  
+  
+  if(period == &#39;james_i&#39;){
+    
+  vectors = james_i_word_vectors[word, , drop = FALSE] 
+  cos_sim = sim2(x = james_i_word_vectors, y = vectors, method = &quot;cosine&quot;, norm = &quot;l2&quot;)
+
+
+}
+  else if(period == &#39;charles_i&#39;){  vectors = charles_i_word_vectors[word, , drop = FALSE] 
+  cos_sim = sim2(x = charles_i_word_vectors, y = vectors, method = &quot;cosine&quot;, norm = &quot;l2&quot;)
+  
+  } 
+  else if(period == &#39;commonwealth&#39;)  { 
+    
+    vectors = commonwealth_word_vectors[word, , drop = FALSE] 
+  cos_sim = sim2(x = commonwealth_word_vectors, y = vectors, method = &quot;cosine&quot;, norm = &quot;l2&quot;)
+  
+  }
+  
+  else if(period == &#39;charles_ii&#39;){
+    
+    vectors = charles_ii_word_vectors[word, , drop = FALSE] 
+  cos_sim = sim2(x = charles_ii_word_vectors, y = vectors, method = &quot;cosine&quot;, norm = &quot;l2&quot;)
+  
+  }
+  
+  else {
+    
+  vectors = james_ii_w_m_ann_word_vectors[word, , drop = FALSE] 
+  cos_sim = sim2(x = james_ii_w_m_ann_word_vectors, y = vectors, method = &quot;cosine&quot;, norm = &quot;l2&quot;)
+  }
+  
+head(sort(cos_sim[,1], decreasing = TRUE), 20)
+
+
+}</code></pre>
+<p>We could now use this function to check individual word associations in a specfied time period. It is more useful to write a second function, which takes a word as an argument and returns a chart of the ten closest words for each reign, making them much easier to instantly compare.</p>
+<pre class="r"><code>first_in_each= function(word) {
+  
+  rbind(top_ten_function(word, &#39;james_i&#39;) %&gt;% tibble::enframe() %&gt;% arrange(desc(value)) %&gt;% slice(2:11) %&gt;% mutate(reign =&#39;james_i&#39; ),
+     top_ten_function(word, &#39;charles_i&#39;) %&gt;% tibble::enframe() %&gt;% arrange(desc(value)) %&gt;% slice(2:11) %&gt;% mutate(reign =&#39;charles_i&#39; ),
+     top_ten_function(word, &#39;commonwealth&#39;) %&gt;% tibble::enframe() %&gt;% arrange(desc(value)) %&gt;% slice(2:11) %&gt;% mutate(reign =&#39;commonwealth&#39; ),
+     top_ten_function(word, &#39;charles_ii&#39;) %&gt;% tibble::enframe() %&gt;% arrange(desc(value)) %&gt;% slice(2:11) %&gt;% mutate(reign =&#39;charles_ii&#39; ),
+     top_ten_function(word, &#39;james_ii_w_m_ann&#39;) %&gt;% tibble::enframe() %&gt;% arrange(desc(value)) %&gt;% slice(2:11) %&gt;% mutate(reign =&#39;james_ii_w_m_ann&#39; ))%&gt;% 
+  group_by(reign) %&gt;% 
+  mutate(rank = rank(value)) %&gt;% 
+  ggplot() + 
+  geom_text(aes(x = factor(reign, levels = c(&#39;james_i&#39;, &#39;charles_i&#39;, &#39;commonwealth&#39;, &#39;charles_ii&#39;, &#39;james_ii&#39;, &#39;james_ii_w_m_ann&#39;)), y = rank, label = name, color = name)) + 
+    theme_void() +
+  theme(legend.position = &#39;none&#39;, 
+        axis.text.x = element_text(face = &#39;bold&#39;),
+        title = element_text(face = &#39;bold&#39;)
+        ) + 
+    labs(title = paste0(&quot;Ten closest semantically-linked words to &#39;&quot;, word,&quot;&#39;&quot;, subtitle =  &quot;for five periods of the 17th Century&quot;))
+  
+  }</code></pre>
+<p>This can show us the changing associations of particular words over time. I’m going to give one interesting example, <em>match</em>.</p>
+<pre class="r"><code>first_in_each(&#39;match&#39;) </code></pre>
+<p><img src="https://networkingarchives.github.io/blog/archive/representing-calendars-of-state-papers-with-word-vectors/index_files/figure-html/unnamed-chunk-37-1.png" width="672" /></p>
+<p>In the reign of James I, ‘match’ is semantically linked to words relating to the marriage: this is because of correspondence relating to the <a href="https://en.wikipedia.org/wiki/Spanish_match">Spanish Match</a>: a proposed match between Charles I and the Infanta Maria Anna of Spain, which eventually fell through. However during Charles I’s reign and afterwards, the meaning changes completely - now the closest words are all to do with the military - match here is mostly being used to refer to a component of a gun or cannon. In the final section of the data, the semantic link returns again to mostly words about marriage - this time it’s not so obvious why the words are associated, but it’s probably relating to the marriage of Philippe II, Duke of Orléans to Françoise Marie de Bourbon, in 1692 - Philippe II was regent of France until 1723.</p>
+<p>While the raw text to reproduce the code here isn’t available yet, I’ve turned the function above into a simple Shiny app, embedded here. Input a word, and click the button to see the results in each of the five periods.</p>
+<iframe src="https://networkingarchives.shinyapps.io/word_vectors/?showcase=0" width="672" height="600px">
+</iframe>
+</div>
+<div id="conclusions" class="section level3">
+<h3>Conclusions</h3>
+<p>The word embeddings trained on the text of the Calendars have shown how certain words related to particular topics. We’ve seen that it often produces expected results (such as <em>King</em> being closest to <em>Majesty</em>), even in complex tasks: with the analogy pen is to letter as X is to book, X is replaced by <em>ink</em>, <em>printer</em>, <em>pamphlet</em>, and some other relevant book-production words. Certain words can be seen to change over time: <em>match</em> is a good example, which is linked to marriage at some times, and weaponry at others, depending on the time period. Many of these word associations reflect biases in the data, but in certain circumstances this can be a strength rather than a weakness. The danger is not investigating the biases, but rather when we are reductive and try to claim that the word associations seen here are in any way representative of how society at large thought about these concepts more generally. On their own terms, the embeddings can be a powerful historical tool to understand the linked meanings within a discrete set of sources.</p>
+</div>
+<div id="further-reading" class="section level3">
+<h3>Further Reading</h3>
+<p><a href="https://www.wwp.northeastern.edu/outreach/seminars/wem_2019-07/presentations/word_vectors/word_vectors_intro_lecture.xhtml">Good basic introduction to word vectors</a></p>
+<p><a href="https://dhh.uni.lu/2018/12/11/word-embeddings-in-humanities/">Word Embeddings in Humanities</a></p>
+<p><a href="https://lab.kb.nl/about-us/blog/introduction-gender-bias-historical-newspapers">Gender bias in historical newspapers</a></p>
+<p><a href="https://nlp.stanford.edu/projects/histwords/">HistWords:Word Embeddings for Historical Text</a></p>
+</div>
+
+    </div>
+  </article>
+
+  
+
+
+</main>
+
+      <footer class="footer">
+        <ul class="footer-links">
+          <li>
+            <a href="/blog/index.xml" type="application/rss+xml" target="_blank">RSS feed</a>
+          </li>
+          <li>
+            <a href="https://gohugo.io/" class="footer-links-kudos">Made with <img src="/blog/images/hugo-logo.png" alt="Img link to Hugo website" width="22" height="22"></a>
+          </li>
+        </ul>
+      </footer>
+
+    </div>
+    
+
+
+
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+
+
+
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/r.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/yaml.min.js"></script>
+<script>hljs.configure({languages: []}); hljs.initHighlightingOnLoad();</script>
+
+
+
+    
+<script src="/blog/js/math-code.js"></script>
+<script async src="//cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+
+
+    
+  </body>
+</html>
+

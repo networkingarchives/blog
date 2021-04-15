@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="generator" content="Hugo 0.82.0" />
+
+
+<title>Tracing Itineraries in the State Papers - Networking Archives Blog</title>
+<meta property="og:title" content="Tracing Itineraries in the State Papers - Networking Archives Blog">
+
+
+  <link href='https://networkingarchives.github.io/blog/favicon.ico' rel='icon' type='image/x-icon'/>
+
+
+
+  
+
+
+
+
+
+
+
+
+<link href='//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css' rel='stylesheet' type='text/css' />
+
+
+
+<link rel="stylesheet" href="/blog/css/fonts.css" media="all">
+<link rel="stylesheet" href="/blog/css/main.css" media="all">
+
+
+
+  </head>
+  <body>
+    <div class="wrapper">
+      <header class="header">
+        <nav class="nav">
+  <a href="/blog/" class="nav-logo">
+    <img src="/blog/images/logo.png"
+         width="50"
+         height="50"
+         alt="Logo">
+  </a>
+
+  <ul class="nav-links">
+    
+    <li><a href="/blog/about/">About</a></li>
+    
+    <li><a href="https://github.com/networkingarchives">GitHub</a></li>
+    
+    <li><a href="https://twitter.com/networkarchives">Twitter</a></li>
+    
+  </ul>
+</nav>
+
+      </header>
+
+
+<main class="content" role="main">
+
+  <article class="article">
+    
+
+    <h1 class="article-title">Tracing Itineraries in the State Papers</h1>
+
+    
+
+    <div class="article-content">
+      
+<script src="https://networkingarchives.github.io/blog/archive/tracing-itineraries-in-the-state-papers/index_files/header-attrs/header-attrs.js"></script>
+
+
+<hr />
+<p>This is an R Notebook: a document containing code and text. The source code is available in a <a href="https://github.com/networkingarchives/blog_notebooks">GitHub repository</a>: download the folder and then open it with <a href="https://rstudio.com/products/rstudio/">R-Studio</a> to run the notebook yourself. You’ll need a little bit of prior knowledge of R and the <a href="https://www.tidyverse.org/">tidyverse</a> to properly follow along. This post is the second in a series documenting some of the code and techniques we’ve been using on the Networking Archives project: you can read the first one, looking at Wikidata, <a href="https://rpubs.com/yannryan/729877">here</a>.</p>
+<p>More info on the Github repository <a href="#info">below</a></p>
+<hr />
+<p><img src="https://networkingarchives.github.io/blog/archive/tracing-itineraries-in-the-state-papers/index_files/figure-html/unnamed-chunk-1-1.png" width="672" /></p>
+<div id="geographic-data-and-the-stuart-state-papers" class="section level3">
+<h3>Geographic Data and the Stuart State Papers</h3>
+<p>The <a href="https://www.gale.com/intl/primary-sources/state-papers-online-early-modern">Stuart State Papers</a> are a treasure trove of geographic data: on the <a href="https://networkingarchives.org/">Networking Archives</a> project we have found coordinates for the origins of more than 80,000 letters in the dataset. These letter origins can be plotted as points on a map, giving an overview of the key places from where correspondence we being sent, but there are other ways to represent and analyse the dataset spatially.</p>
+<p>Many of the individuals in the data do not just send multiple letters from the same spot, but rather travel around for various reasons, sending letters, often at great expense, back to government officials in London. In the seventeenth century, letter authors might travel as part of a diplomatic mission, or as part of a ‘grand tour’, or, in some cases, because they were forcibly displaced or exiled. In the State Papers are found, for example, individuals displaced by the English Civil War: many leading politicians and generals were exiled to the continent following the defeat of the Royalists and the execution of Charles I in January 1649. As they would have been at the time they were written, the letters in the State Papers are an excellent source of news about events and places, and for understanding more about life on the move in early modern Europe.</p>
+</div>
+<div id="reconstructing-itineraries" class="section level3">
+<h3>Reconstructing Itineraries</h3>
+<p>We can use the the points of origin of the letters to reconstruct parts of these routes or itineraries.The basic method to do this is to line up all the origins from where a given individual wrote a letter, then draw a line connecting them in date order. The resulting line can be used for a whole host of spatial operations. All this can be done with the <a href="https://r-spatial.github.io/sf/">R package ‘sf’</a>. This package is very fast, relatively easy to use, and completely free, so no need for any expensive licensed GIS software.</p>
+<p>In this post I’m going to show how to use the sf package to create a geographic object, transform each individual’s origin locations into a single line, measure those lines, and then map one, before introducing some basic spatial computation. The object used to do all this is created through the following steps:</p>
+<ul>
+<li>Import places data</li>
+<li>Join the letter places to the coordinates table</li>
+<li>Turn into a sf object</li>
+<li>Summarise by each person</li>
+<li>Cast to a linestring</li>
+</ul>
+</div>
+<div id="import-places-data" class="section level3">
+<h3>Import places data</h3>
+<p>First, we need place data. I’ve made a very simplified sample of the State Papers data with which to work. It contains just the necessary info we need to measure journeys. The data is divided into three tables, which will be joined together when needed. I’ve saved them as the following tables:</p>
+<ul>
+<li>First, the main letters table, called sp_letters. This contains the letter records for the sample. It has an ID for each person, the date of the letter, and the origin.</li>
+</ul>
+<pre class="r"><code>library(tidyverse)  
+sp_letters = read_csv(&#39;/Users/Yann/Documents/Github/blog_notebooks/sp_letters.csv&#39;)
+
+glimpse(sp_letters)</code></pre>
+<pre><code>## Rows: 3,346
+## Columns: 3
+## $ person_id  &lt;dbl&gt; 22662, 22662, 13045, 22662, 13045, 22662, 30822, 42044, 43…
+## $ date       &lt;dbl&gt; 16030330, 16030412, 16030704, 16030710, 16030912, 16031001…
+## $ place_name &lt;chr&gt; &quot;London&quot;, &quot;London&quot;, &quot;Windsor&quot;, &quot;London&quot;, &quot;Eaglefield&quot;, &quot;Hi…</code></pre>
+<ul>
+<li>Next, a lookup table containing the ID code for each person in the sample, plus their actual name:</li>
+</ul>
+<pre class="r"><code>sp_people = read_csv(&#39;/Users/Yann/Documents/Github/blog_notebooks/sp_people.csv&#39;)
+glimpse(sp_people)</code></pre>
+<pre><code>## Rows: 99
+## Columns: 2
+## $ person_id   &lt;dbl&gt; 13045, 7154, 22662, 42773, 30822, 42044, 43109, 51384, 41…
+## $ person_name &lt;chr&gt; &quot;Dudley Carleton, Viscount Dorchester&quot;, &quot;Charles, Viscoun…</code></pre>
+<ul>
+<li>Last, a lookup table containing the coordinates for each place:</li>
+</ul>
+<pre class="r"><code>sp_coords = read_csv(&#39;/Users/Yann/Documents/Github/blog_notebooks/sp_coords.csv&#39;)
+glimpse(sp_coords)</code></pre>
+<pre><code>## Rows: 459
+## Columns: 3
+## $ place_name            &lt;chr&gt; &quot;Abergavenny&quot;, &quot;Aboard the Assurance at Lee&quot;, &quot;…
+## $ coordinates_latitude  &lt;dbl&gt; -3.0172222, 0.6500000, 9.2844444, 9.2844444, 9.…
+## $ coordinates_longitude &lt;dbl&gt; 51.833056, 51.550000, 53.823056, 53.823056, 53.…</code></pre>
+</div>
+<div id="join-the-letters-to-the-coordinates-table" class="section level3">
+<h3>Join the letters to the coordinates table</h3>
+<p>Next, we join the sp_coords table to the sp_letters table, using the ‘place_name’ column. This will add the coordinates for each place.</p>
+<pre class="r"><code>sp_letters_with_coordinates = sp_letters %&gt;% left_join(sp_coords, by = &#39;place_name&#39;)
+
+glimpse(sp_letters_with_coordinates)</code></pre>
+<pre><code>## Rows: 3,346
+## Columns: 5
+## $ person_id             &lt;dbl&gt; 22662, 22662, 13045, 22662, 13045, 22662, 30822…
+## $ date                  &lt;dbl&gt; 16030330, 16030412, 16030704, 16030710, 1603091…
+## $ place_name            &lt;chr&gt; &quot;London&quot;, &quot;London&quot;, &quot;Windsor&quot;, &quot;London&quot;, &quot;Eagle…
+## $ coordinates_latitude  &lt;dbl&gt; -0.1275000, -0.1275000, -0.6000000, -0.1275000,…
+## $ coordinates_longitude &lt;dbl&gt; 51.50722, 51.50722, 51.48333, 51.50722, 51.4430…</code></pre>
+<p>Now is a good time to remove any NA values, which will give an error later on:</p>
+<pre class="r"><code>sp_letters_with_coordinates = sp_letters_with_coordinates %&gt;% 
+  filter(!is.na(coordinates_latitude)) %&gt;% 
+  filter(!is.na(coordinates_longitude))</code></pre>
+</div>
+<div id="make-the-sf-object" class="section level3">
+<h3>Make the sf object</h3>
+<p>The next step is to turn this information into something which can be represented spatially. The R package sf has made working with geographic data very easy. It stores geographic data as a ‘simple features’ object, which looks and acts just like a dataframe (think spreadsheet - an object which you can easily filter, sort and perform calculations on), but has a couple of extra pieces of information.</p>
+<ul>
+<li><p>A special ‘geometry’ column, which stores the spatial information - usually a point, line or polygon, but there are a few other types too.</p></li>
+<li><p>A Coordinate Reference System (or CRS), which tells the software which map projection to use when drawing maps or performing calculations. The details of this are a bit beyond this blog, but the important thing to know is that it needs one to measure the line lengths properly, and if you want to map or merge multiple simple features dataframes, they need to be converted to the same CRS. <a href="https://geocompr.robinlovelace.net/spatial-class.html#crs-intro">Here</a> is a good place to learn more.</p></li>
+</ul>
+<p>First, load the ‘sf’ library:</p>
+<pre class="r"><code>library(sf)</code></pre>
+<p>Next, take the dataset with coordinates we made above, and covert it into an sf object using the function <code>st_as_sf</code>.</p>
+<p>You need to tell the function where to find the coordinates using the <code>coords=</code> argument, as a vector in the order latitude, longitude.</p>
+<pre class="r"><code>sp_letters_with_coordinates_sf = sp_letters_with_coordinates %&gt;% st_as_sf(coords = c(&#39;coordinates_latitude&#39;, &#39;coordinates_longitude&#39;))</code></pre>
+<p>Look at the details of the sf object using <code>sp_letters_with_coordinates_sf$geometry</code>:</p>
+<pre class="r"><code>sp_letters_with_coordinates_sf$geometry</code></pre>
+<pre><code>## Geometry set for 3206 features 
+## geometry type:  POINT
+## dimension:      XY
+## bbox:           xmin: -61.8 ymin: 1.515436 xmax: 27.13838 ymax: 56.07139
+## CRS:            NA
+## First 5 geometries:</code></pre>
+<p>Each letter location in the dataframe is now represented as a single ‘feature’, in this case, a geographic point. The sf object also stores the bounding box (the outer limits of the points) and the CRS, which in this case, is still NA. We will add the ESPG code 4326 using the function <code>st_set_crs</code>, which is sort of a shorthand for the CRS ‘WGS84’, a standard CRS used by many mapping applications, including Google Maps/Earth. When we look at the geometry again, you’ll see that ‘WGS 84’ has been added.</p>
+<pre class="r"><code>sp_letters_with_coordinates_sf = sp_letters_with_coordinates_sf %&gt;% st_set_crs(4326)
+
+sp_letters_with_coordinates_sf$geometry</code></pre>
+<pre><code>## Geometry set for 3206 features 
+## geometry type:  POINT
+## dimension:      XY
+## bbox:           xmin: -61.8 ymin: 1.515436 xmax: 27.13838 ymax: 56.07139
+## geographic CRS: WGS 84
+## First 5 geometries:</code></pre>
+</div>
+<div id="from-points-to-lines" class="section level3">
+<h3>From points to lines</h3>
+<p>The next step is to turn this dataset of <strong>points</strong> features into a dataset of <strong>lines</strong> features, one per letter author. This is done by grouping the data by each author, then summarising the data so that each feature is a collection of multiple points, which is then cast into a line - an object we can measure the length of.</p>
+<p>First, make sure the data is arranged in date order:</p>
+<pre class="r"><code>sp_letters_with_coordinates_sf = sp_letters_with_coordinates_sf %&gt;%
+  arrange(date)</code></pre>
+<p>Next, group by the person id, and then summarise, with the argument <code>do_union = FALSE</code>, which tells sf not to summarise the points together using st_union() but rather keep them as a series:</p>
+<pre class="r"><code>multipoint_sf = sp_letters_with_coordinates_sf %&gt;% 
+  group_by(person_id) %&gt;% 
+  summarise(do_union = F)
+
+multipoint_sf$geometry</code></pre>
+<pre><code>## Geometry set for 99 features 
+## geometry type:  MULTIPOINT
+## dimension:      XY
+## bbox:           xmin: -61.8 ymin: 1.515436 xmax: 27.13838 ymax: 56.07139
+## geographic CRS: WGS 84
+## First 5 geometries:</code></pre>
+<p>See that the object has changed. There are now 99 ‘features’ instead of 3,206 - one for each author in the data. Each feature is a collection of points, listed in date order. A final step in creating the sf object is to cast these collections of points into lines - effectively joining the points for each person up and transforming into a new feature called a <em>linestring</em>. This is done with <code>st_cast</code>, and the type of transformation is specified with the argument <code>to = 'LINESTRING'</code>.</p>
+<pre class="r"><code>lines_sf = multipoint_sf %&gt;% st_cast(to = &#39;LINESTRING&#39;)
+lines_sf$geometry</code></pre>
+<pre><code>## Geometry set for 99 features 
+## geometry type:  LINESTRING
+## dimension:      XY
+## bbox:           xmin: -61.8 ymin: 1.515436 xmax: 27.13838 ymax: 56.07139
+## geographic CRS: WGS 84
+## First 5 geometries:</code></pre>
+<p>That’s it! Now the simple features object can be used for spatial computation and maps. Because it looks like a regular dataframe, the regular R and tidyverse methods will work for sorting, filtering and so forth.</p>
+</div>
+<div id="measure-the-length-with-st_length" class="section level3">
+<h3>Measure the length with st_length()</h3>
+<p>Use <code>mutate</code> and <code>st_length()</code> to measure the length of each line and store it in a new column. This uses a ‘great circles’ formula and returns an answer in the unit used by the CRS (in this case, metres). Arrange these in descending order to get the ‘most distance travelled’:</p>
+<pre class="r"><code>lines_sf = lines_sf %&gt;% mutate(distance = st_length(.))
+
+lines_sf %&gt;% arrange(desc(distance))</code></pre>
+<pre><code>## Simple feature collection with 99 features and 2 fields
+## geometry type:  LINESTRING
+## dimension:      XY
+## bbox:           xmin: -61.8 ymin: 1.515436 xmax: 27.13838 ymax: 56.07139
+## geographic CRS: WGS 84
+## # A tibble: 99 x 3
+##    person_id                                                   geometry distance
+##        &lt;dbl&gt;                                           &lt;LINESTRING [°]&gt;      [m]
+##  1     43546 (-1.983333 50.71667, -1.087222 50.80583, -1.087222 50.805… 15063364
+##  2     43775 (2.351389 48.85694, -8.530556 51.7075, -0.1255556 51.5044… 11790170
+##  3     44760 (-0.1275 51.50722, -0.066 51.5275, -0.086851 1.515436, -0… 11122900
+##  4      3772 (-5.066667 50.15, -5.066667 50.15, 1.4897 51.1856, -1.136…  8065940
+##  5     13045 (-0.6 51.48333, -1.1 51.443, -0.337499 51.4034, -0.1275 5…  7314443
+##  6     49024 (1.904167 47.90222, 1.904167 47.90222, 1.904167 47.90222,…  6506617
+##  7      5715 (12.33194 45.43972, 12.33194 45.43972, 1.4897 51.1856, 10…  6191440
+##  8      5586 (10.31667 43.55, -9.1604 38.7452, 1.55 52.06667, 1.2625 5…  5815678
+##  9     13168 (-6.033333 54.51667, -6.033333 54.51667, -6.033333 54.516…  4936128
+## 10     13845 (-0.4366443 49.12234, -1.083333 53.95, -1.083333 53.95, -…  4140303
+## # … with 89 more rows</code></pre>
+<p>This is where the lookup table of people comes in. As you can join an sf dataframe to a regular dataframe, we’ll join the sf object to the people table, so that we can see the names of those listed at the top.</p>
+<pre class="r"><code>lines_sf %&gt;% 
+  left_join(sp_people, by = &#39;person_id&#39;) %&gt;% 
+  arrange(desc(distance))</code></pre>
+<pre><code>## Simple feature collection with 99 features and 3 fields
+## geometry type:  LINESTRING
+## dimension:      XY
+## bbox:           xmin: -61.8 ymin: 1.515436 xmax: 27.13838 ymax: 56.07139
+## geographic CRS: WGS 84
+## # A tibble: 99 x 4
+##    person_id                                 geometry distance person_name      
+##        &lt;dbl&gt;                         &lt;LINESTRING [°]&gt;      [m] &lt;chr&gt;            
+##  1     43546 (-1.983333 50.71667, -1.087222 50.80583… 15063364 Sir Richard Plum…
+##  2     43775 (2.351389 48.85694, -8.530556 51.7075, … 11790170 Sir Robert South…
+##  3     44760 (-0.1275 51.50722, -0.066 51.5275, -0.0… 11122900 Sir William Rider
+##  4      3772 (-5.066667 50.15, -5.066667 50.15, 1.48…  8065940 Capt. Jeffery Pe…
+##  5     13045 (-0.6 51.48333, -1.1 51.443, -0.337499 …  7314443 Dudley Carleton,…
+##  6     49024 (1.904167 47.90222, 1.904167 47.90222, …  6506617 Thomas Windebank 
+##  7      5715 (12.33194 45.43972, 12.33194 45.43972, …  6191440 Captain Jonas Po…
+##  8      5586 (10.31667 43.55, -9.1604 38.7452, 1.55 …  5815678 Captain John Hub…
+##  9     13168 (-6.033333 54.51667, -6.033333 54.51667…  4936128 Duke of Schomberg
+## 10     13845 (-0.4366443 49.12234, -1.083333 53.95, …  4140303 Edmund Lord Shef…
+## # … with 89 more rows</code></pre>
+<p>This dataset is a random sample of some authors, but still the results at the top show a mixture of diplomats (e.g. Robert Southwell, Dudley Carleton), and many naval captains.</p>
+<p>The naval captains are a special case, because measuring their distance travelled ‘as the crow flies’ grossly underestimates the total distance. A ‘least-cost path’ algorithm can be used to estimate the distance travelled by sea, but that will have to be another blog post.</p>
+</div>
+<div id="mapping-spatial-lines" class="section level3">
+<h3>Mapping spatial lines</h3>
+<p>To show how these routes look like in practice, we’ll map the travels of Thomas Windebank - son of Francis Windebank, Secretary of State of Charles I. You can see by looking at his letter origins that he travelled extensively between 1633 and 1644, sending letters from France, Spain, and Italy. He often travelled with his brother Francis, and they made the journey from Rome back to London through Italy and France together, in the spring of 1637. Many letters sent from the sons to their father during this journey have made their way to the State Papers.</p>
+<pre class="r"><code>sp_letters %&gt;% 
+  filter(person_id ==49024)</code></pre>
+<pre><code>## # A tibble: 66 x 3
+##    person_id     date place_name
+##        &lt;dbl&gt;    &lt;dbl&gt; &lt;chr&gt;     
+##  1     49024 16330728 Orleans   
+##  2     49024 16331204 Orleans   
+##  3     49024 16331225 Orleans   
+##  4     49024 16340131 Orleans   
+##  5     49024 16340221 Orleans   
+##  6     49024 16340326 Orleans   
+##  7     49024 16340512 Orleans   
+##  8     49024 16340601 Orleans   
+##  9     49024 16340603 Orleans   
+## 10     49024 16340730 Angers    
+## # … with 56 more rows</code></pre>
+<p>Load the libraries <code>rnaturalearth</code> and <code>rnaturalearthdata</code> and download a map of the world using <code>ne_coastline</code>.</p>
+<pre class="r"><code>library(rnaturalearth)
+library(rnaturalearthdata)
+
+map = ne_coastline(scale = &#39;medium&#39;, returnclass = &#39;sf&#39;) 
+
+map = map %&gt;% st_set_crs(4326)</code></pre>
+<p>Draw the map, using the ggplot <a href="https://ggplot2.tidyverse.org/reference/#section-geoms">geom</a> <code>geom_sf()</code>. This is a special geom that correctly plots sf objects to the correct type of feature. Use <code>filter()</code> to just plot Windebank’s route - he’s ID 49024.</p>
+<pre class="r"><code>library(ggsflabel)
+places_points = sp_letters_with_coordinates_sf %&gt;% filter(person_id == 49024) %&gt;% distinct(geometry, .keep_all = T)
+
+places_points = places_points %&gt;% st_set_crs(4326)
+
+p = ggplot() + 
+  geom_sf(data = map, lwd = .2) + 
+  geom_sf(data = lines_sf %&gt;% 
+            filter(person_id == 49024), color = &#39;blue&#39;, alpha = .8) + 
+  geom_sf(data = places_points)+ 
+  geom_sf_text_repel(data = places_points, aes(label = place_name),size = 2) + 
+  theme_void() + 
+  coord_sf(xlim = c(-10, 35), ylim = c(36, 60)) + 
+  labs(title = &#39;Routes of Thomas Windebank, 1633 - 1644&#39;) + 
+  theme(plot.title = element_text(face = &#39;bold&#39;, size = 16))
+p</code></pre>
+<p><img src="https://networkingarchives.github.io/blog/archive/tracing-itineraries-in-the-state-papers/index_files/figure-html/unnamed-chunk-18-1.png" width="672" /></p>
+</div>
+<div id="more-simple-features-computation-using-st_join" class="section level3">
+<h3>More simple features computation, using st_join()</h3>
+<p>As well as mapping and measuring lines, the simple features object can be used to perform a whole range of geo-spatial calculations and computation.</p>
+<p>For example, one can extract all lines which pass within a given distance of a certain point.</p>
+<p>To do this, make a simple feature object with one feature - the coordinates for Paris. I just googled the coordinates, but if you read my <a href="https://rpubs.com/yannryan/729877">last blog post</a>, you could also do this directly using Wikidata. Make sure to set the CRS.</p>
+<pre class="r"><code>paris = tibble(place = &#39;paris&#39;, coordinates_latitude = 2.352222, coordinates_longitude = 48.856613)
+
+paris_sf = st_as_sf(paris, coords = c(&#39;coordinates_latitude&#39; , &#39;coordinates_longitude&#39;))
+
+paris_sf = paris_sf %&gt;% 
+  st_set_crs(4326)</code></pre>
+<p>Next, use <code>st_join()</code>, a function from the sf package which performs spatial joins. Instead of joining on a key, a <em>spatial join</em> joins two sf datasets together using a spatial operation - which could be ‘intersects’, ‘touches’, or ‘is within distance of’, as used here.</p>
+<p>Using st_join, join the lines_sf object (the collection of lines for each person) with the newly-created paris_sf object. We need to specify the join type (<code>st_is_within_distance</code>), the maximum distance, and that we only want to keep the rows where there is a successful join (i.e where the line at some point is within 100 kilometres of Paris), specified by the argument <code>left = FALSE</code>.</p>
+<p>This could be useful for finding individuals who likely passed through a certain place but didn’t send a letter from there.</p>
+<pre class="r"><code>paris_lines = st_join(lines_sf, paris_sf, join = st_is_within_distance, dist = 100, left = FALSE) 
+
+paris_lines</code></pre>
+<pre><code>## Simple feature collection with 11 features and 3 fields
+## geometry type:  LINESTRING
+## dimension:      XY
+## bbox:           xmin: -9.1604 ymin: 38.7452 xmax: 14.25 ymax: 55.9527
+## geographic CRS: WGS 84
+## # A tibble: 11 x 4
+##    person_id                                            geometry  distance place
+##  *     &lt;dbl&gt;                                    &lt;LINESTRING [°]&gt;       [m] &lt;chr&gt;
+##  1      7136 (4.31 52.08, -0.1275 51.50722, 0.4105 52.2459, 4.3…  3754439… paris
+##  2     10405 (-0.1275 51.50722, -0.1275 51.50722, -0.1275 51.50…   687664… paris
+##  3     13045 (-0.6 51.48333, -1.1 51.443, -0.337499 51.4034, -0…  7314443… paris
+##  4     18991 (2.351389 48.85694, 2.351389 48.85694, 2.351389 48…  1265118… paris
+##  5     24263 (-2.65595 52.0107, -2.65595 52.0107, 2.351389 48.8…  1721473… paris
+##  6     27799                (-7.7116 52.3539, 2.351389 48.85694)   810654… paris
+##  7     43458 (-0.1333 51.4995, -0.1275 51.50722, -0.1275 51.507…   718841… paris
+##  8     43775 (2.351389 48.85694, -8.530556 51.7075, -0.1255556 … 11790169… paris
+##  9     44231 (2.351389 48.85694, -2.125 49.175, -2.125 49.175, …   999702… paris
+## 10     44520 (2.351389 48.85694, -0.1275 51.50722, -0.1275 51.5…  1199219… paris
+## 11     49024 (1.904167 47.90222, 1.904167 47.90222, 1.904167 47…  6506617… paris</code></pre>
+<p>The resulting 11 lines:</p>
+<pre class="r"><code>ggplot() + 
+  geom_sf(data = map, lwd = .2) + 
+  geom_sf(data = paris_lines) + 
+  theme_void() + 
+  coord_sf(xlim = c(-10, 35), ylim = c(36, 60))</code></pre>
+<p><img src="https://networkingarchives.github.io/blog/archive/tracing-itineraries-in-the-state-papers/index_files/figure-html/unnamed-chunk-21-1.png" width="672" /></p>
+<p>Were these lines combined with a road network as found in <a href="https://www.campop.geog.cam.ac.uk/research/occupations/datasets/catalogues/">Campop</a> we could plot likely paths along established routes, and then check those routes to see if they came within a certain distance of a given point.</p>
+</div>
+<div id="intersecting-lines-and-polygons" class="section level3">
+<h3>Intersecting lines and polygons</h3>
+<p>Another join method performs a match if a line intersects a polygon. This can be used to find a list of routes which passed within a given border, a country, say.</p>
+<p>To do this, first go to (<a href="https://boundingbox.klokantech.com/" class="uri">https://boundingbox.klokantech.com/</a>) and draw a polygon around the border of modern-day Switzerland (or any other boundary you’re interested in) using the polygon tool on the top-left of the map (highlighted in red in the image below). This could also be done with a package like osm, but I like the flexibility of drawing my own border, especially for historical data.</p>
+<p><img src="Screenshot%202021-03-04%20at%2015.49.32.png" /></p>
+<p>Once that’s done, use the drop-down on the bottom-left to change the format to geoJSON.</p>
+<p><img src="Screenshot%202021-03-04%20at%2015.52.05.png" /></p>
+<p>Then copy and paste the result in between the following code:</p>
+<pre><code>&#39;{&quot;type&quot;:&quot;LineString&quot;,&quot;coordinates&quot;:[**the geoJSON result goes here***]}&#39;</code></pre>
+<p>Save this as a variable called switzerland_polygon</p>
+<pre class="r"><code>library(geojsonsf)
+
+switzerland_polygon &lt;- &#39;{&quot;type&quot;:&quot;LineString&quot;,&quot;coordinates&quot;:[[9.0259826183,45.832402749],[8.8831603527,45.8936076909],[8.8282287121,46.0158154441],[8.6854064465,46.0996769553],[8.5315978527,46.1910169923],[8.4437072277,46.2973888353],[8.4546935558,46.4565599202],[8.3228576183,46.4262773882],[8.202008009,46.3277429091],[8.0811583996,46.2897976864],[8.1690490246,46.213828322],[8.026226759,46.1225261729],[7.9822814465,46.0158154441],[7.8284728527,45.9241848947],[7.6197326183,45.9852887707],[7.4769103527,45.9318265638],[7.323101759,45.9241848947],[7.1912658215,45.8706637339],[7.059429884,45.8859607581],[6.9385802746,46.0081853548],[6.9056212902,46.1072944137],[6.7737853527,46.1605871525],[6.8177306652,46.3049789321],[6.7627990246,46.4338495991],[6.5101134777,46.4489908651],[6.3013732433,46.4111298103],[6.268414259,46.3125679766],[6.2464416027,46.183411111],[6.0816466808,46.1072944137],[5.8948791027,46.1453659181],[5.9717833996,46.2973888353],[6.0486876965,46.3959780242],[6.0596740246,46.539750101],[6.2134826183,46.6680664278],[6.4661681652,46.7885571342],[6.4332091808,46.9387920766],[6.5980041027,47.0511924171],[6.883648634,47.1782937099],[6.9825255871,47.3348821483],[6.8726623058,47.3869754036],[6.9825255871,47.5132734828],[7.1802794933,47.4761584717],[7.3450744152,47.4538768727],[7.5098693371,47.5503622628],[7.6856505871,47.5874248145],[7.938336134,47.5800144022],[8.1251037121,47.6096497572],[8.3448302746,47.5948341777],[8.3668029308,47.6688701199],[8.5425841808,47.8092495052],[8.7842833996,47.7206328783],[9.0040099621,47.6836647227],[9.2237365246,47.6762679456],[9.432476759,47.6096497572],[9.5423400402,47.5429466051],[9.6851623058,47.3944130985],[9.4874083996,47.2305413089],[9.520367384,47.0886066639],[9.6302306652,47.043706416],[9.871929884,47.0212421089],[9.9048888683,46.9312903141],[10.0586974621,46.863727159],[10.2674376965,46.9237875008],[10.3223693371,46.9987683457],[10.4432189465,46.9762851258],[10.4981505871,46.8712383803],[10.4212462902,46.8261552861],[10.3882873058,46.7434046605],[10.3443419933,46.6605268215],[10.487164259,46.6228130165],[10.4432189465,46.5321926165],[10.311383009,46.5850729212],[10.2674376965,46.6303578807],[10.1685607433,46.6454444542],[10.047711134,46.5775217472],[10.047711134,46.4716948745],[10.1136291027,46.38082203],[10.1575744152,46.2518261579],[10.0696837902,46.2822054852],[10.0037658215,46.335328797],[9.8389708996,46.4035544433],[9.6192443371,46.2518261579],[9.4874083996,46.3732424548],[9.4654357433,46.4943894167],[9.3665587902,46.5019521603],[9.2676818371,46.3429136328],[9.2786681652,46.2518261579],[9.1907775402,46.1605871525],[9.0479552746,46.0844388809],[9.0259826183,45.832402749]]}&#39;</code></pre>
+<p>Using the function <code>geojson_sf()</code> convert it to an sf object, cast it to a polygon, add a column called place with the value ‘Switzerland’</p>
+<pre class="r"><code>switz_sf &lt;- geojson_sf(switzerland_polygon)
+
+switz_sf = st_as_sf(switz_sf)
+
+switz_sf = switz_sf %&gt;% st_cast(&#39;POLYGON&#39;)
+
+
+switz_sf = switz_sf %&gt;% st_set_crs(4326)
+
+swiss_lines = st_join(lines_sf,switz_sf, left = FALSE) </code></pre>
+<p>Joining this to the sp_people dataset shows that the following routes passed through Switzerland, as the crow flies at least (as mentioned, this doesn’t work for ship captains):</p>
+<pre class="r"><code>swiss_lines %&gt;% left_join(sp_people, by = &#39;person_id&#39;) %&gt;% select(person_name)</code></pre>
+<pre><code>## Simple feature collection with 3 features and 1 field
+## geometry type:  LINESTRING
+## dimension:      XY
+## bbox:           xmin: -6.265833 ymin: 38.41273 xmax: 27.13838 ymax: 53.3425
+## geographic CRS: WGS 84
+## # A tibble: 3 x 2
+##   person_name                                                           geometry
+##   &lt;chr&gt;                                                         &lt;LINESTRING [°]&gt;
+## 1 Captain Jonas Poole       (12.33194 45.43972, 12.33194 45.43972, 1.4897 51.18…
+## 2 Dudley Carleton, Viscoun… (-0.6 51.48333, -1.1 51.443, -0.337499 51.4034, -0.…
+## 3 Sir Gilbert Talbot        (12.33194 45.43972, 4.399722 51.22111, 4.35 50.85, …</code></pre>
+<p>A map of these routes:</p>
+<pre class="r"><code>ggplot() + 
+  geom_sf(data = map, lwd = .2) + 
+  geom_sf(data = swiss_lines) +
+  geom_sf(data= switz_sf, color = &#39;blue&#39;, fill = NA, alpha = .7)+ 
+  theme_void() + 
+  coord_sf(xlim = c(-10, 35), ylim = c(36, 60))</code></pre>
+<p><img src="https://networkingarchives.github.io/blog/archive/tracing-itineraries-in-the-state-papers/index_files/figure-html/unnamed-chunk-25-1.png" width="672" /></p>
+</div>
+<div id="thomas-windebanks-river-crossings" class="section level3">
+<h3>Thomas Windebank’s River Crossings</h3>
+<p>One last demonstration, showing how this spatial data can be combined with external spatial datasets to perform new operations. We’ll use the sf lines object plus a dataset of world rivers, to find a list of all major rivers Thomas Windebank had to cross during his voyages.</p>
+<p>First, download an sf dataset of rivers from Natural Earth:</p>
+<pre class="r"><code>rivers50 &lt;- ne_download(scale = 50, type = &#39;rivers_lake_centerlines&#39;, category = &#39;physical&#39;, returnclass = &#39;sf&#39; )</code></pre>
+<pre><code>## OGR data source with driver: ESRI Shapefile 
+## Source: &quot;/private/var/folders/17/s_d6htjx57q4x5cvv20gjthm0000gq/T/RtmpYJBHZg&quot;, layer: &quot;ne_50m_rivers_lake_centerlines&quot;
+## with 462 features
+## It has 32 fields
+## Integer64 fields read as strings:  ne_id</code></pre>
+<pre class="r"><code>rivers50 = rivers50 %&gt;% st_set_crs(4326)</code></pre>
+<p>Returning to the route of Thomas Windebank, above, which rivers did he cross or travel near?</p>
+<p>Use <code>st_join()</code> again, this time with the rivers dataset as x, and Thomas Windebank’s route as y. This will filter to show only rivers within 10,000 metres of Windebank’s route.</p>
+<pre class="r"><code>tw_rivers = st_join(rivers50,lines_sf %&gt;% 
+            filter(person_id == 49024),  join = st_is_within_distance, dist = 10000, left = FALSE) </code></pre>
+<p>Draw a map to check the results, rivers also drawn on the map, and labeled (with a weird typo in the Natural Earth dataset for the river Tagus):</p>
+<pre class="r"><code>ggplot() + 
+  geom_sf(data = map, lwd = .2) + 
+  geom_sf(data = lines_sf %&gt;% 
+            filter(person_id == 49024), alpha =.6) +
+  geom_sf(data= tw_rivers, color = &#39;blue&#39;, fill = NA, alpha = .9)+
+  geom_sf_label_repel(data= tw_rivers, alpha = .9, aes(label = name_en), size = 2.5) + 
+  theme_void() + 
+  coord_sf(xlim = c(-10, 35), ylim = c(36, 60)) + 
+  labs(title = &quot;Major Rivers Crossed by Thomas Windebank&quot;) + 
+  theme(plot.title = element_text(size = 16, face = &#39;bold&#39;))</code></pre>
+<p><img src="https://networkingarchives.github.io/blog/archive/tracing-itineraries-in-the-state-papers/index_files/figure-html/unnamed-chunk-28-1.png" width="672" /></p>
+</div>
+<div id="other-uses" class="section level3">
+<h3>Other Uses</h3>
+<p>Representing these routes as spatial features has great potential. With a dataset of early modern roads, for example, one could calculate the likely path of each route, rather than measuring and mapping as the crow flies. Combined with date information and an average speed of movement, we could guess when an author on the road may have crossed paths with others, or if they may have been caught up in a particular event, such as a battle or siege. Wikidata even has <a href="https://en.wikipedia.org/wiki/List_of_battles_1601%E2%80%931800">lists of battles</a>, complete with coordinates, which could be used as a starting point.</p>
+<hr />
+</div>
+<div id="special-thanks" class="section level3">
+<h3>Special Thanks</h3>
+<p>This post is based on work by the whole Networking Archives team (past and present). A special thank-you to Miranda, who has curated and cleaned much of the State Papers geographic data - none of this would be possible without that work!</p>
+</div>
+<div id="further-reading" class="section level3">
+<h3>Further Reading</h3>
+<ul>
+<li><p>[Official site of the sf package] (<a href="https://r-spatial.github.io/sf/" class="uri">https://r-spatial.github.io/sf/</a>) - check out the ‘articles’ section, particularly the <a href="https://r-spatial.github.io/sf/articles/sf1.html">introduction</a> for an overview of the sf package.</p></li>
+<li><p><a href="https://geocompr.robinlovelace.net/">Geocomputation with R</a> - by far the best starting-point for learning how to use geographic data with R. Lots on using sf but also other relevant packages.</p></li>
+<li><p>Two great blog posts by Jesse Sadler:</p>
+<ul>
+<li><a href="https://www.jessesadler.com/post/gis-with-r-intro/">Introduction to GIS with R</a> and</li>
+<li><a href="https://www.jessesadler.com/post/simple-feature-objects/">An Exploration of Simple Features for R</a></li>
+</ul></li>
+</ul>
+<hr />
+</div>
+<div id="info" class="section level3">
+<h3>More info on this document</h3>
+<p>This document can be run locally using R-Studio, by clicking on the <a href="https://github.com/networkingarchives/blog_notebooks">GitHub link</a>. You’ll need to install a few packages first using <code>install.packages</code>:</p>
+<pre><code>tidyverse
+sf
+rnaturalearth
+rnaturalearthdata
+ggsflabel
+geojsonsf</code></pre>
+<p>In theory, it could also be run through<a href="https://mybinder.org/v2/gh/networkingarchives/blog_notebooks/HEAD?urlpath=rstudio">MyBinder</a>, a service which spins up a copy of R-Studio in the cloud and allows you to run any notebook without installing anything yourself, but unfortunately at the moment the sf package seems to be incompatible. It’s worth clicking the link, as perhaps they’ll fix the dependency in the future (and I’ll update this page if I notice it changes) ` Any questions please feel free to <a href="www.twitter.com/lievesofgrass">tweet me</a>.</p>
+<hr />
+</div>
+
+    </div>
+  </article>
+
+  
+
+
+</main>
+
+      <footer class="footer">
+        <ul class="footer-links">
+          <li>
+            <a href="/blog/index.xml" type="application/rss+xml" target="_blank">RSS feed</a>
+          </li>
+          <li>
+            <a href="https://gohugo.io/" class="footer-links-kudos">Made with <img src="/blog/images/hugo-logo.png" alt="Img link to Hugo website" width="22" height="22"></a>
+          </li>
+        </ul>
+      </footer>
+
+    </div>
+    
+
+
+
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+
+
+
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/r.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/yaml.min.js"></script>
+<script>hljs.configure({languages: []}); hljs.initHighlightingOnLoad();</script>
+
+
+
+    
+<script src="/blog/js/math-code.js"></script>
+<script async src="//cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+
+
+    
+  </body>
+</html>
+

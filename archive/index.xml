@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Archives on Networking Archives Blog</title>
+    <link>https://networkingarchives.github.io/blog/archive/</link>
+    <description>Recent content in Archives on Networking Archives Blog</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Thu, 15 Apr 2021 00:00:00 +0000</lastBuildDate><atom:link href="https://networkingarchives.github.io/blog/archive/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Tracing Itineraries in the State Papers</title>
+      <link>https://networkingarchives.github.io/blog/archive/tracing-itineraries-in-the-state-papers/</link>
+      <pubDate>Thu, 15 Apr 2021 00:00:00 +0000</pubDate>
+      
+      <guid>https://networkingarchives.github.io/blog/archive/tracing-itineraries-in-the-state-papers/</guid>
+      <description>This is an R Notebook: a document containing code and text. The source code is available in a GitHub repository: download the folder and then open it with R-Studio to run the notebook yourself. You’ll need a little bit of prior knowledge of R and the tidyverse to properly follow along. This post is the second in a series documenting some of the code and techniques we’ve been using on the Networking Archives project: you can read the first one, looking at Wikidata, here.</description>
+    </item>
+    
+    <item>
+      <title>Women in the State Papers Online - Through the Data</title>
+      <link>https://networkingarchives.github.io/blog/archive/women-in-the-state-papers-online-through-the-data/</link>
+      <pubDate>Thu, 15 Apr 2021 00:00:00 +0000</pubDate>
+      
+      <guid>https://networkingarchives.github.io/blog/archive/women-in-the-state-papers-online-through-the-data/</guid>
+      <description>You can’t search for women in the State Papers Online. There’s no way of knowing how many letters they wrote, or received, or how often they were mentioned. If you know the name you’re looking for you can search through the descriptions and abstracts, but you would need to watch out for spelling variants or mistakes. This method also doesn’t help estimate how many letters there are overall, and it limits the possibility of the chance discovery of women’s writing in the archive.</description>
+    </item>
+    
+    <item>
+      <title>Exploring the Calendars of State Papers with Word Vectors</title>
+      <link>https://networkingarchives.github.io/blog/archive/representing-calendars-of-state-papers-with-word-vectors/</link>
+      <pubDate>Wed, 14 Apr 2021 00:00:00 +0000</pubDate>
+      
+      <guid>https://networkingarchives.github.io/blog/archive/representing-calendars-of-state-papers-with-word-vectors/</guid>
+      <description>Text and Models What can a body of text tell us about the worldview of its authors? Many Digital Humanities projects involve constructing models: a general name for a kind of representation of something which makes it in some way easier to interpret. TEI-encoded text is an example of a model: we take the ‘raw material’ of a document, its text, and add elements to it to make it easier to work with and analyse.</description>
+    </item>
+    
+  </channel>
+</rss>
