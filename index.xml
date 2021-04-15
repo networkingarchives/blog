@@ -50,7 +50,8 @@ Clicking on the MyBinder link above will bring you to an R-Studio instance. In t
       <pubDate>Thu, 05 May 2016 21:48:51 -0700</pubDate>
       
       <guid>https://networkingarchives.github.io/blog/about/</guid>
-      <description>This is a &amp;ldquo;hello world&amp;rdquo; example website for the blogdown package. The theme was forked from @jrutheiser/hugo-lithium-theme and modified by Yihui Xie.</description>
+      <description>‘Networking Archives’ is a three-year, AHRC funded research project which will merge the early modern correspondence data collected in ‘Early Modern Letters Online’ with metadata from the ‘Gale State Papers Online’ to create thereby the UK’s largest meta-archive of curated early modern correspondence metadata.
+The resulting dataset and accompanying infrastructure will allow researchers to interrogate and analyse epistolary metadata on an unprecedented scale and to pose new kinds of questions on the history of ‘intelligencing’ from the 16th to 18th centuries.</description>
     </item>
     
   </channel>
