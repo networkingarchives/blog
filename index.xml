@@ -6,7 +6,17 @@
     <description>Recent content on Networking Archives Blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Wed, 14 Apr 2021 00:00:00 +0000</lastBuildDate><atom:link href="https://networkingarchives.github.io/blog/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Thu, 15 Apr 2021 00:00:00 +0000</lastBuildDate><atom:link href="https://networkingarchives.github.io/blog/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>R and Wikidata</title>
+      <link>https://networkingarchives.github.io/blog/2021/04/15/r-and-wikidata/</link>
+      <pubDate>Thu, 15 Apr 2021 00:00:00 +0000</pubDate>
+      
+      <guid>https://networkingarchives.github.io/blog/2021/04/15/r-and-wikidata/</guid>
+      <description>This is an R Notebook: a document containing code and text. A live version can be run through MyBinder, which will spin up a copy of R-studio for you to use, and the source code is available on GitHub.
+Clicking on the MyBinder link above will bring you to an R-Studio instance. In the ‘files’ window in the bottom-right of R-studio, open the document ‘r_and_wikidata.Rmd’, which will open this with a live copy of the code, which can be edited and re-run.</description>
+    </item>
+    
     <item>
       <title>Exploring the Calendars of State Papers with Word Vectors</title>
       <link>https://networkingarchives.github.io/blog/2021/04/14/representing-calendars-of-state-papers-with-word-vectors/</link>
