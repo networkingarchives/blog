@@ -18,6 +18,15 @@ Clicking on the MyBinder link above will bring you to an R-Studio instance. In t
     </item>
     
     <item>
+      <title>Tracing Itineraries in the State Papers</title>
+      <link>https://networkingarchives.github.io/blog/2021/04/15/tracing-itineraries-in-the-state-papers/</link>
+      <pubDate>Thu, 15 Apr 2021 00:00:00 +0000</pubDate>
+      
+      <guid>https://networkingarchives.github.io/blog/2021/04/15/tracing-itineraries-in-the-state-papers/</guid>
+      <description>This is an R Notebook: a document containing code and text. The source code is available in a GitHub repository: download the folder and then open it with R-Studio to run the notebook yourself. You’ll need a little bit of prior knowledge of R and the tidyverse to properly follow along. This post is the second in a series documenting some of the code and techniques we’ve been using on the Networking Archives project: you can read the first one, looking at Wikidata, here.</description>
+    </item>
+    
+    <item>
       <title>Women in the State Papers Online - Through the Data</title>
       <link>https://networkingarchives.github.io/blog/2021/04/15/women-in-the-state-papers-online-through-the-data/</link>
       <pubDate>Thu, 15 Apr 2021 00:00:00 +0000</pubDate>
