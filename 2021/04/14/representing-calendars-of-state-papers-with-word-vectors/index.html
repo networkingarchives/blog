@@ -162,7 +162,7 @@ euc.dist(pointA, pointB)</code></pre>
 
 plot_ly(data = word_vectors_3d, x =  ~x, y = ~y,z =  ~z, text = ~word) %&gt;% add_markers() %&gt;% layout(title = &quot;3D Representation of Word Vectors&quot;)</code></pre>
 <div id="htmlwidget-1" style="width:672px;height:480px;" class="plotly html-widget"></div>
-<script type="application/json" data-for="htmlwidget-1">{"x":{"visdat":{"6d4770db1960":["function () ","plotlyVisDat"]},"cur_data":"6d4770db1960","attrs":{"6d4770db1960":{"x":{},"y":{},"z":{},"text":{},"alpha_stroke":1,"sizes":[10,100],"spans":[1,20],"type":"scatter3d","mode":"markers","inherit":true}},"layout":{"margin":{"b":40,"l":60,"t":25,"r":10},"title":"3D Representation of Word Vectors","scene":{"xaxis":{"title":"x"},"yaxis":{"title":"y"},"zaxis":{"title":"z"}},"hovermode":"closest","showlegend":false},"source":"A","config":{"showSendToCloud":false},"data":[{"x":[10,8,6,5,6,5,2,1],"y":[0,1,3,5,8,8,10,9],"z":[1,3,5,2,7,8,4,3],"text":["crufts","feed","cat","dog","mouse","rabbit","cape","hero"],"type":"scatter3d","mode":"markers","marker":{"color":"rgba(31,119,180,1)","line":{"color":"rgba(31,119,180,1)"}},"error_y":{"color":"rgba(31,119,180,1)"},"error_x":{"color":"rgba(31,119,180,1)"},"line":{"color":"rgba(31,119,180,1)"},"frame":null}],"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.2,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
+<script type="application/json" data-for="htmlwidget-1">{"x":{"visdat":{"d23f4f764068":["function () ","plotlyVisDat"]},"cur_data":"d23f4f764068","attrs":{"d23f4f764068":{"x":{},"y":{},"z":{},"text":{},"alpha_stroke":1,"sizes":[10,100],"spans":[1,20],"type":"scatter3d","mode":"markers","inherit":true}},"layout":{"margin":{"b":40,"l":60,"t":25,"r":10},"title":"3D Representation of Word Vectors","scene":{"xaxis":{"title":"x"},"yaxis":{"title":"y"},"zaxis":{"title":"z"}},"hovermode":"closest","showlegend":false},"source":"A","config":{"showSendToCloud":false},"data":[{"x":[10,8,6,5,6,5,2,1],"y":[0,1,3,5,8,8,10,9],"z":[1,3,5,2,7,8,4,3],"text":["crufts","feed","cat","dog","mouse","rabbit","cape","hero"],"type":"scatter3d","mode":"markers","marker":{"color":"rgba(31,119,180,1)","line":{"color":"rgba(31,119,180,1)"}},"error_y":{"color":"rgba(31,119,180,1)"},"error_x":{"color":"rgba(31,119,180,1)"},"line":{"color":"rgba(31,119,180,1)"},"frame":null}],"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.2,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
 <p>You can start to understand how the words now cluster together in the 3D plot: rabbit and mouse are clustered together, but now in the third dimension they are further away from dog. We can use the same formula as above to calculate these distances, just by adding the z coordinates to the pointA and pointB vectors:</p>
 <pre class="r"><code>pointA = c(word_vectors_3d$x[word_vectors_3d$word == &#39;dog&#39;], word_vectors_3d$y[word_vectors_3d$word == &#39;dog&#39;], word_vectors_3d$z[word_vectors_3d$word == &#39;dog&#39;])
 pointB = c(word_vectors_3d$x[word_vectors_3d$word == &#39;mouse&#39;], word_vectors_3d$y[word_vectors_3d$word == &#39;mouse&#39;], word_vectors_3d$z[word_vectors_3d$word == &#39;mouse&#39;])
@@ -203,54 +203,19 @@ df_for_results %&gt;% arrange(dist)</code></pre>
 <h3>From Vectors to Word Embeddings</h3>
 <p>These vectors are also known as word embeddings. Real algorithms base the vectors on more sophisticated metrics than that I used above. Some, such as <a href="https://nlp.stanford.edu/projects/glove/">GloVe</a> record co-occurrence probabilities (the likelihood of every pair of words in a corpus to co-occur within a set ‘window’ of words either side), using a neural network, and pre-trained over enormous corpora of text. The resulting vectors are often used to represent the relationships between modern meanings of words, to <a href="https://dh2017.adho.org/abstracts/582/582.pdf">track semantic changes over time</a>, or to understand the history of <a href="https://ccdkconceptlab.wordpress.com/">concepts</a>, though it’s worth pointing out they’re only as representative as the corpus used (many use sources such as Wikipedia, or Reddit, mostly produced by white men and so there’s a danger of biases towards those groups).</p>
 <p>Word embeddings are often critiqued as reflecting or propogating bias (I highly recommend Kaspar Beelen’s <a href="https://lab.kb.nl/about-us/blog/introduction-gender-bias-historical-newspapers">post</a> and <a href="https://github.com/KBNLresearch/WordEmbeddingPlayground">tools</a> to understand more about this) of their source texts. The source used here is a corpus consisting of the printed summaries of the Calendars of State Papers, which I’ve described in detail <a href="https://networkingarchives.github.io/blog/2021/04/14/text-mining/">here</a>. As such it is likely highly biased, but if the purpose of an analysis is historical, for example to understand how a concept was represented at a given time, by a specific group, in a particular body of text, the biases captured by word embeddings can be seen as a research strength rather than a weakness. The data is in no way representative of early modern text more generally, and, what’s more, the summaries were written in the 19th century and so will reflect what editors at the time thought was important. In these two ways, the corpus will reproduce a very particular wordview of a very specific group, at a very specific time. Because of this, can use the embeddings to get an idea of how certain words or ideas were semantically linked, <em>specifically in the corpus of calendar abstracts.</em> The data will not show us how early modern concepts were related, but it might show conceptual changes in words within the information apparatus of the state.</p>
-<p>The following instructions are adapted from the <a href="http://text2vec.org/glove.html">project vignette</a> and <a href="https://m-clark.github.io/text-analysis-with-R/word-embeddings.html">this tutorial</a>. First, tokenise all the abstract text and remove very common words called stop words:</p>
+<p>The following instructions are adapted from the <a href="http://text2vec.org/glove.html">project vignette</a> and <a href="https://m-clark.github.io/text-analysis-with-R/word-embeddings.html">this tutorial</a>. It uses the package text2vec, through which it’s possible to train the GloVe algorithm using R. First, tokenise all the abstract text and remove very common words called stop words:</p>
 <pre class="r"><code>library(text2vec)
 library(tidytext)
-library(textstem)</code></pre>
-<pre><code>## Loading required package: koRpus.lang.en</code></pre>
-<pre><code>## Loading required package: koRpus</code></pre>
-<pre><code>## Loading required package: sylly</code></pre>
-<pre><code>## For information on available language packages for &#39;koRpus&#39;, run
-## 
-##   available.koRpus.lang()
-## 
-## and see ?install.koRpus.lang()</code></pre>
-<pre><code>## 
-## Attaching package: &#39;koRpus&#39;</code></pre>
-<pre><code>## The following object is masked from &#39;package:readr&#39;:
-## 
-##     tokenize</code></pre>
-<pre class="r"><code>data(&quot;stop_words&quot;)</code></pre>
+library(textstem)
+data(&quot;stop_words&quot;)</code></pre>
 <p>Next, load and pre-process the abstract text:</p>
-<pre class="r"><code>spo_raw = read_delim(&#39;/Users/Yann/Documents/MOST RECENT DATA/fromto_all_place_mapped_stuart_sorted&#39;, delim = &#39;\t&#39;, col_names = F )</code></pre>
-<pre><code>## 
-## ── Column specification ────────────────────────────────────────────────────────
-## cols(
-##   X1 = col_double(),
-##   X2 = col_double(),
-##   X3 = col_character(),
-##   X4 = col_character(),
-##   X5 = col_character(),
-##   X6 = col_character(),
-##   X7 = col_character(),
-##   X8 = col_character()
-## )</code></pre>
-<pre class="r"><code>spo_mapped_people = read_delim(&#39;/Users/Yann/Downloads/people_docs_stuart_200421&#39;, delim = &#39;\t&#39;, col_names = F)</code></pre>
-<pre><code>## 
-## ── Column specification ────────────────────────────────────────────────────────
-## cols(
-##   X1 = col_double(),
-##   X2 = col_character(),
-##   X3 = col_character(),
-##   X4 = col_character(),
-##   X5 = col_character(),
-##   X6 = col_character(),
-##   X7 = col_logical()
-## )</code></pre>
-<pre class="r"><code>load(&#39;/Users/Yann/Documents/non-Github/spo_data/g&#39;)
-g = g %&gt;% group_by(path) %&gt;% summarise(value = paste0(value, collapse = &quot;&lt;br&gt;&quot;))</code></pre>
-<pre><code>## `summarise()` ungrouping output (override with `.groups` argument)</code></pre>
-<pre class="r"><code>spo_raw = spo_raw %&gt;%
+<pre class="r"><code>spo_raw = read_delim(&#39;/Users/Yann/Documents/MOST RECENT DATA/fromto_all_place_mapped_stuart_sorted&#39;, delim = &#39;\t&#39;, col_names = F )
+spo_mapped_people = read_delim(&#39;/Users/Yann/Downloads/people_docs_stuart_200421&#39;, delim = &#39;\t&#39;, col_names = F)
+
+load(&#39;/Users/Yann/Documents/non-Github/spo_data/g&#39;)
+g = g %&gt;% group_by(path) %&gt;% summarise(value = paste0(value, collapse = &quot;&lt;br&gt;&quot;))
+
+spo_raw = spo_raw %&gt;%
 mutate(X7 = str_replace(X7, &quot;spo&quot;, &quot;SPO&quot;)) %&gt;%
 separate(X7, into = c(&#39;Y1&#39;, &#39;Y2&#39;, &#39;Y3&#39;), sep = &#39;/&#39;) %&gt;%
 mutate(fullpath = paste0(&quot;/Users/Yann/Documents/non-Github/spo_xml/&quot;, Y1, &#39;/XML/&#39;, Y2,&quot;/&quot;, Y3)) %&gt;% mutate(uniquecode = paste0(&quot;Z&quot;, 1:nrow(spo_raw), &quot;Z&quot;))
@@ -258,14 +223,13 @@ mutate(fullpath = paste0(&quot;/Users/Yann/Documents/non-Github/spo_xml/&quot;, 
 withtext = left_join(spo_raw, g, by = c(&#39;fullpath&#39; = &#39;path&#39;)) %&gt;%
 left_join(spo_mapped_people %&gt;% dplyr::select(X1, from_name = X2), by = c(&#39;X1&#39; = &#39;X1&#39;))%&gt;%
 left_join(spo_mapped_people %&gt;% dplyr::select(X1, to_name = X2), by = c(&#39;X2&#39; = &#39;X1&#39;)) </code></pre>
-<p>Tokenize the text using the {Tidytext} function {unnest_tokens()}, remove stop words, lemmatize the text (reduce the words to their stem) using {textstem}, and remove numbers. This creates a new dataset, with one row per word, plus.</p>
+<p>Tokenize the text using the function <code>unnest_tokens()</code> from the <a href="https://cran.r-project.org/web/packages/tidytext/vignettes/tidytext.html">idytext</a> library, remove stop words, lemmatize the text (reduce the words to their stem) using <a href="https://cran.r-project.org/web/packages/textstem/index.html">textstem</a>, and filter out any words which are actually just numbers. T<code>unnest_tokens</code> makes a new dataframe based on the inputted text, with one word per row, which can then be counted, sorted, filtered and so forth.</p>
 <pre class="r"><code>words = withtext %&gt;% 
   ungroup()  %&gt;% 
   select(document = X5, value, date = X3) %&gt;%
   unnest_tokens(word, value) %&gt;% anti_join(stop_words)%&gt;% 
   mutate(word = lemmatize_words(word)) %&gt;% filter(!str_detect(word, &quot;[0-9]{1,}&quot;))</code></pre>
-<pre><code>## Joining, by = &quot;word&quot;</code></pre>
-<p>Create a ‘vocabulary’, which is just a list of each word found in the dataset and the times they occur, and ‘prune’ it to only words which occur at least five times.</p>
+<p>Create a ‘vocabulary’ with the word2vec package, which is just a list of each word found in the dataset and the times they occur, and ‘prune’ it to only words which occur at least five times.</p>
 <pre class="r"><code>words_ls = list(words$word)
 
 it = itoken(words_ls, progressbar = FALSE)
@@ -273,7 +237,7 @@ it = itoken(words_ls, progressbar = FALSE)
 vocab = create_vocabulary(it)
 
 vocab = prune_vocabulary(vocab, term_count_min = 5)</code></pre>
-<p>With the vocabulary, construct a ‘term co-occurence matrix’: this is a matrix of rows and columns, counting all the times each word co-occurs with every other word, within a window which can be set with the argument <code>skip_grams_window =</code></p>
+<p>With the vocabulary, next construct a ‘term co-occurence matrix’: this is a matrix of rows and columns, counting all the times each word co-occurs with every other word, within a window which can be set with the argument <code>skip_grams_window =</code></p>
 <pre class="r"><code>vectorizer = vocab_vectorizer(vocab)
 
 # use window of 10 for context words
@@ -313,7 +277,7 @@ word_vectors = wv_main + t(wv_context)</code></pre>
 </div>
 <div id="results" class="section level3">
 <h3>Results</h3>
-<p>The next step was to write a small function which calculates and displays the closest words to a given word, to make it easier to query the result. There’s an important change here: instead of using the euclidean distance formula above, distance is calculated using the <em>cosine similarity</em>, which measures the angular distance between the words (this is better because it <a href="https://cmry.github.io/notes/euclidean-v-cosine#:~:text=While%20cosine%20looks%20at%20the,though%20they%20were%20further%20away.">corrects for one word appearing many times and another appearing very infrequently</a>).</p>
+<p>The next step was to write a small function which calculates and displays the closest words to a given word, to make it easier to query the results. There’s an important change here: instead of using the euclidean distance formula above, distance is calculated using the <em>cosine similarity</em>, which measures the angular distance between the words (this is better because it <a href="https://cmry.github.io/notes/euclidean-v-cosine#:~:text=While%20cosine%20looks%20at%20the,though%20they%20were%20further%20away.">corrects for one word appearing many times and another appearing very infrequently</a>).</p>
 <pre class="r"><code>ten_closest_words = function(word){
 
 word_result = word_vectors[word, , drop = FALSE] 
@@ -324,7 +288,7 @@ cos_sim = sim2(x = word_vectors, y = word_result, method = &quot;cosine&quot;, n
 head(sort(cos_sim[,1], decreasing = TRUE), 20)
 
 }</code></pre>
-<p>The function takes a single word as an argument and returns the twenty closest word vectors, by cosine distance. What are the closest in useage to ‘king’?</p>
+<p>The function takes a single word as an argument and returns the twenty closest word vectors, by cosine distance. What are the closest in useage to <em>king</em>?</p>
 <pre class="r"><code>ten_closest_words(&#39;king&#39;)</code></pre>
 <pre><code>##      king   majesty    king&#39;s     queen      late majesty&#39;s       seq    prince 
 ## 1.0000000 0.8124185 0.8115906 0.7544641 0.7394790 0.7276555 0.7186679 0.7103045 
@@ -332,8 +296,8 @@ head(sort(cos_sim[,1], decreasing = TRUE), 20)
 ## 0.7099343 0.7034877 0.6939898 0.6939041 0.6891967 0.6883882 0.6882395 0.6853770 
 ##   declare      lord      time      pray 
 ## 0.6852612 0.6807144 0.6745944 0.6742028</code></pre>
-<p>Unsurprisingly, a word that is often interchangeable with King, Majesty, is the closest, followed by ‘Queen’ - also obviously interchangeable with King, depending on the circumstances.</p>
-<p>Word embeddings are often used to understand different and changing <a href="https://lab.kb.nl/about-us/blog/introduction-gender-bias-historical-newspapers">gender representations</a>. How are gendered words represented in the State Papers abstracts? First of all, wife:</p>
+<p>Unsurprisingly, a word that is often interchangeable with <em>King</em>, <em>Majesty</em>, is the closest, followed by <em>Queen</em> - also obviously interchangeable with King, depending on the circumstances.</p>
+<p>Word embeddings are often used to understand different and changing <a href="https://lab.kb.nl/about-us/blog/introduction-gender-bias-historical-newspapers">gender representations</a>. How are gendered words represented in the State Papers abstracts? First of all, <em>wife</em>:</p>
 <pre class="r"><code>ten_closest_words(&#39;wife&#39;)</code></pre>
 <pre><code>##      wife   husband     child    sister    mother      lady   brother  daughter 
 ## 1.0000000 0.8191674 0.7883127 0.7646102 0.7566901 0.7429047 0.7282066 0.7235836 
@@ -382,7 +346,7 @@ head(sort(cos_sim_test[,1], decreasing = T), 20)</code></pre>
 ##  0.6601502  0.6553503  0.6457852  0.6442256  0.6426027  0.6372307  0.6346641 
 ##        day      bring       note    arrival williamson       week 
 ##  0.6346036  0.6327272  0.6321395  0.6297362  0.6263445  0.6220473</code></pre>
-<p>It is also a way of finding analogies: so, for example, <em>Paris</em> - <em>France</em> + <em>Germany</em> should equal to <em>Berlin</em>, because Berlin is like the Paris of France. Is that what we get?</p>
+<p>This is a way of finding semantically-linked analogies beyond simply two equivalent words. so, for example, <em>Paris</em> - <em>France</em> + <em>Germany</em> should equal to <em>Berlin</em>, because Berlin is like the Paris of France. It’s the equivalent of those primary school exercises ‘Paris is to France as ____ is to Germany’. As the word vectors are numbers, they can be added and subtracted. What does the State Papers corpus think is the Paris of Germany?</p>
 <pre class="r"><code>test = word_vectors[&quot;paris&quot;, , drop = F] -
   word_vectors[&quot;france&quot;, , drop = F] +
   word_vectors[&quot;germany&quot;, , drop = F]
@@ -398,7 +362,7 @@ head(sort(cos_sim_test[,1], decreasing = T), 10)</code></pre>
 ##    veteri   edmonds 
 ## 0.4216843 0.4046615</code></pre>
 <p>After Germany and Paris, the most similar to Paris - France + Germany is Brussels: not the correct answer, but a close enough guess!</p>
-<p>We can try other analogies: pen - letter + book should in theory give some word related to printing and book production such as print, or press, or maybe type (Think pen is to letter as X is to book).</p>
+<p>We can try other analogies: pen - letter + book (pen is to letter as _____ is to book) should in theory give some word related to printing and book production such as print, or press, or maybe type:</p>
 <pre class="r"><code>test = word_vectors[&quot;pen&quot;, , drop = F] -
   word_vectors[&quot;letter&quot;, , drop = F] +
     word_vectors[&quot;book&quot;, , drop = F]
@@ -418,7 +382,8 @@ head(sort(cos_sim_test[,1], decreasing = T), 20)</code></pre>
 </div>
 <div id="change-in-semantic-relations-over-time" class="section level3">
 <h3>Change in Semantic Relations Over Time</h3>
-<p>We can also look for change in semantic meaning over time. First, divide the text into four separate sections, one for each reign:</p>
+<p>Another, potentially more interesting way to use a longitudinal corpus like this is to look for change in semantic meaning over time. This can be done by splitting the data into temporally distinct sections, and compare word associations.</p>
+<p>First, divide the text into four separate sections, one for each reign:</p>
 <pre class="r"><code>library(lubridate)
 james_i = withtext %&gt;% 
   mutate(year = year(ymd(X4))) %&gt;% 
@@ -653,7 +618,7 @@ james_ii_w_m_ann_wv_main = james_ii_w_m_ann_glove$fit_transform(james_ii_w_m_ann
 # Either word-vectors matrices could work, but the developers of the technique
 # suggest the sum/mean may work better
 james_ii_w_m_ann_word_vectors = james_ii_w_m_ann_wv_main + t(james_ii_w_m_ann_wv_context)</code></pre>
-<p>Write a function as above, this time with two arguments, so we can specify both the word and the relevant reign:</p>
+<p>Write a function to query the results as we did above, this time with two arguments, so we can specify both the word and the relevant reign:</p>
 <pre class="r"><code>top_ten_function = function(word, period){
   
   
@@ -692,7 +657,7 @@ head(sort(cos_sim[,1], decreasing = TRUE), 20)
 
 
 }</code></pre>
-<p>Write a second function, which takes a word and returns the ten closest words for each reign:</p>
+<p>We could now use this function to check individual word associations in a specfied time period. It is more useful to write a second function, which takes a word as an argument and returns a chart of the ten closest words for each reign, making them much easier to instantly compare.</p>
 <pre class="r"><code>first_in_each= function(word) {
   
   rbind(top_ten_function(word, &#39;james_i&#39;) %&gt;% tibble::enframe() %&gt;% arrange(desc(value)) %&gt;% slice(2:11) %&gt;% mutate(reign =&#39;james_i&#39; ),
