@@ -289,16 +289,16 @@ sample_tbl_graph %&gt;% ggraph(&#39;nicely&#39;) + geom_node_point() + geom_edge
   activate(nodes)%&gt;% 
   mutate(degree = centrality_degree(mode = &#39;total&#39;)) %&gt;% 
   filter(degree &gt;2) %&gt;% ggraph(&#39;nicely&#39;) + geom_node_point() + geom_edge_link()</code></pre>
-<p><img src="https://networkingarchives.github.io/blog/2021/04/15/my-network-analysis-workflow/index_files/figure-html/unnamed-chunk-10-1.png" width="672" />
-<code>geom_node_point()</code> and <code>geom_edge_link</code> take aesthetics, just like regular ggplot geoms:</p>
+<p><img src="https://networkingarchives.github.io/blog/2021/04/15/my-network-analysis-workflow/index_files/figure-html/unnamed-chunk-10-1.png" width="672" /></p>
+<p><code>geom_node_point()</code> and <code>geom_edge_link</code> take aesthetics, just like regular ggplot geoms:</p>
 <pre class="r"><code>sample_tbl_graph %&gt;% 
   activate(nodes)%&gt;% 
   mutate(degree = centrality_degree(mode = &#39;total&#39;))  %&gt;% 
   ggraph(&#39;nicely&#39;) + 
   geom_node_point(aes(size = degree)) + 
   geom_edge_link()</code></pre>
-<p><img src="https://networkingarchives.github.io/blog/2021/04/15/my-network-analysis-workflow/index_files/figure-html/unnamed-chunk-11-1.png" width="672" />
-Add <code>geom_node_text()</code> to add text labels to your network.</p>
+<p><img src="https://networkingarchives.github.io/blog/2021/04/15/my-network-analysis-workflow/index_files/figure-html/unnamed-chunk-11-1.png" width="672" /></p>
+<p>Add <code>geom_node_text()</code> to add text labels to your network.</p>
 <pre class="r"><code>sample_tbl_graph %&gt;% 
   activate(nodes)%&gt;% 
   mutate(degree = centrality_degree(mode = &#39;total&#39;))  %&gt;% 
@@ -310,7 +310,7 @@ Add <code>geom_node_text()</code> to add text labels to your network.</p>
 </div>
 <div id="networks---the-lazy-way" class="section level3">
 <h3>Networks - the Lazy Way!</h3>
-<p>Learning network analysis can be a big investment in time and effort, and, while the techniques do apply to lots of other areas of data science, it’s not the most transferable coding skill. I called the blog post the lazy person’s network analysis workflow because if you’ve already learned (or intend to learn) the much more general data science and visualisation skills of the Tidyverse and Ggplot, you’ve already done about 90% of the work. At the same time, any new things you do pick up when using this workflow on network analysis will feed back into your more general coding/data science knowledge.</p>
+<p>Learning network analysis can be a big investment in time and effort, and, while the techniques do apply to lots of other areas of data science, it’s not the most transferable coding skill. I called the blog post the lazy person’s network analysis workflow because if you’ve already learned (or intend to learn) the much more general data science and visualisation skills of the <code>tidyverse</code> and <code>ggplot</code>, you’ve already done about 90% of the work. At the same time, any new things you do pick up when using this workflow on network analysis will feed back into your more general coding/data science knowledge.</p>
 </div>
 
     </div>
