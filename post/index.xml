@@ -45,12 +45,12 @@ Clicking on the MyBinder link above will bring you to an R-Studio instance. In t
     </item>
     
     <item>
-      <title>Text Mining</title>
+      <title>Text Mining the State Papers</title>
       <link>https://networkingarchives.github.io/blog/2021/04/14/text-mining/</link>
       <pubDate>Wed, 14 Apr 2021 00:00:00 +0000</pubDate>
       
       <guid>https://networkingarchives.github.io/blog/2021/04/14/text-mining/</guid>
-      <description>Calendars of State Papers and Networking Archives Most of the Networking Archives project has been using the metadata, or data about, the digitised correspondence from the State Papers Online. Metadata in this sense means everything except the content of the letters: including author names, recipient names, date, place of sending and so on, in the research of seventeenth-century intelligencing. Gale State Papers Online brings together a number of historical primary sources, connecting the original manuscript images from the State Papers with the ‘Calendars of State Papers’, a printed resource.</description>
+      <description>Calendars of State Papers and Networking Archives Most of the quantitative research on the Networking Archives project has been using the metadata from the digitised correspondence of [State Papers Online](https://www.gale.com/primary-sources/state-papers-online. Metadata in this sense means everything except the content of the letters: including author names, recipient names, date, place of sending and so on, in the research of seventeenth-century intelligencing. Gale State Papers Online brings together a number of historical primary sources, not only the manuscript images from the State Papers, but also full text versions of the ‘Calendars of State Papers’, a set of printed finding aids mostly produced in the nineteenth century.</description>
     </item>
     
   </channel>
