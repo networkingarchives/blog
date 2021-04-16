@@ -13,8 +13,7 @@
       <pubDate>Thu, 15 Apr 2021 00:00:00 +0000</pubDate>
       
       <guid>https://networkingarchives.github.io/blog/2021/04/15/my-network-analysis-workflow/</guid>
-      <description>The Networking Archives project is using tools from other disciplines to write histories of seventeenth-century intelligencing and correspondence. Key in the toolset for the project is network analysis. Network analysis is a suite of tools developed to understand and analyse networks, specifically, network graphs, a formal term for a mathematical graph of entities, known as nodes, connected by vertices, or edges.
-There are tonnes of tools available for converting data into a network format.</description>
+      <description>The Networking Archives project is using tools from other disciplines to write histories of seventeenth-century intelligencing and correspondence. Key in the toolset for the project is network analysis. Network analysis is a suite of tools developed to understand and analyse networks, specifically, network graphs, a formal term for a mathematical graph of entities, known as nodes, connected by vertices, or edges. Mostly they boil down to either specific software packages with a GUI, such as Gephi or Palladio, or dedicated libraries within a coding language such as Python’s NetworkX or R’s Igraph.</description>
     </item>
     
     <item>
