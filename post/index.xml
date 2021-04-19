@@ -6,7 +6,16 @@
     <description>Recent content in Posts on Networking Archives Blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Thu, 15 Apr 2021 00:00:00 +0000</lastBuildDate><atom:link href="https://networkingarchives.github.io/blog/post/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Mon, 19 Apr 2021 00:00:00 +0000</lastBuildDate><atom:link href="https://networkingarchives.github.io/blog/post/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Text Mining the State Papers</title>
+      <link>https://networkingarchives.github.io/blog/2021/04/19/text-mining/</link>
+      <pubDate>Mon, 19 Apr 2021 00:00:00 +0000</pubDate>
+      
+      <guid>https://networkingarchives.github.io/blog/2021/04/19/text-mining/</guid>
+      <description>Calendars of State Papers and Networking Archives Most of the quantitative research on the Networking Archives project has been using the metadata from the digitised correspondence of State Papers Online. Metadata in this sense means everything except the content of the letters: including author names, recipient names, date, place of sending and so on, in the research of seventeenth-century intelligencing. Gale State Papers Online brings together a number of historical primary sources, not only the manuscript images from the State Papers, but also full text versions of the ‘Calendars of State Papers’, a set of printed finding aids mostly produced in the nineteenth century.</description>
+    </item>
+    
     <item>
       <title>A Lazy Person&#39;s Network Analysis Workflow</title>
       <link>https://networkingarchives.github.io/blog/2021/04/15/my-network-analysis-workflow/</link>
@@ -14,15 +23,6 @@
       
       <guid>https://networkingarchives.github.io/blog/2021/04/15/my-network-analysis-workflow/</guid>
       <description>The Networking Archives project is using tools from other disciplines to write histories of seventeenth-century intelligencing and correspondence. Key in the toolset for the project is network analysis. Network analysis is a suite of tools developed to understand and analyse networks, specifically, network graphs, a formal term for a mathematical graph of entities, known as nodes, connected by vertices, or edges. Mostly they boil down to either specific software packages with a GUI, such as Gephi or Palladio, or dedicated libraries within a coding language such as Python’s NetworkX or R’s Igraph.</description>
-    </item>
-    
-    <item>
-      <title>Text Mining the State Papers</title>
-      <link>https://networkingarchives.github.io/blog/2021/04/14/text-mining/</link>
-      <pubDate>Wed, 14 Apr 2021 00:00:00 +0000</pubDate>
-      
-      <guid>https://networkingarchives.github.io/blog/2021/04/14/text-mining/</guid>
-      <description>Calendars of State Papers and Networking Archives Most of the quantitative research on the Networking Archives project has been using the metadata from the digitised correspondence of State Papers Online. Metadata in this sense means everything except the content of the letters: including author names, recipient names, date, place of sending and so on, in the research of seventeenth-century intelligencing. Gale State Papers Online brings together a number of historical primary sources, not only the manuscript images from the State Papers, but also full text versions of the ‘Calendars of State Papers’, a set of printed finding aids mostly produced in the nineteenth century.</description>
     </item>
     
     <item>

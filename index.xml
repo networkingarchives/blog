@@ -6,7 +6,16 @@
     <description>Recent content on Networking Archives Blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Thu, 15 Apr 2021 00:00:00 +0000</lastBuildDate><atom:link href="https://networkingarchives.github.io/blog/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Mon, 19 Apr 2021 00:00:00 +0000</lastBuildDate><atom:link href="https://networkingarchives.github.io/blog/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Text Mining the State Papers</title>
+      <link>https://networkingarchives.github.io/blog/2021/04/19/text-mining/</link>
+      <pubDate>Mon, 19 Apr 2021 00:00:00 +0000</pubDate>
+      
+      <guid>https://networkingarchives.github.io/blog/2021/04/19/text-mining/</guid>
+      <description>Calendars of State Papers and Networking Archives Most of the quantitative research on the Networking Archives project has been using the metadata from the digitised correspondence of State Papers Online. Metadata in this sense means everything except the content of the letters: including author names, recipient names, date, place of sending and so on, in the research of seventeenth-century intelligencing. Gale State Papers Online brings together a number of historical primary sources, not only the manuscript images from the State Papers, but also full text versions of the ‘Calendars of State Papers’, a set of printed finding aids mostly produced in the nineteenth century.</description>
+    </item>
+    
     <item>
       <title>A Lazy Person&#39;s Network Analysis Workflow</title>
       <link>https://networkingarchives.github.io/blog/2021/04/15/my-network-analysis-workflow/</link>
@@ -41,15 +50,6 @@
       
       <guid>https://networkingarchives.github.io/blog/archive/representing-calendars-of-state-papers-with-word-vectors/</guid>
       <description>Text and Models What can a body of text tell us about the worldview of its authors? Many Digital Humanities projects involve constructing models: a general name for a kind of representation of something which makes it in some way easier to interpret. TEI-encoded text is an example of a model: we take the ‘raw material’ of a document, its text, and add elements to it to make it easier to work with and analyse.</description>
-    </item>
-    
-    <item>
-      <title>Text Mining the State Papers</title>
-      <link>https://networkingarchives.github.io/blog/2021/04/14/text-mining/</link>
-      <pubDate>Wed, 14 Apr 2021 00:00:00 +0000</pubDate>
-      
-      <guid>https://networkingarchives.github.io/blog/2021/04/14/text-mining/</guid>
-      <description>Calendars of State Papers and Networking Archives Most of the quantitative research on the Networking Archives project has been using the metadata from the digitised correspondence of State Papers Online. Metadata in this sense means everything except the content of the letters: including author names, recipient names, date, place of sending and so on, in the research of seventeenth-century intelligencing. Gale State Papers Online brings together a number of historical primary sources, not only the manuscript images from the State Papers, but also full text versions of the ‘Calendars of State Papers’, a set of printed finding aids mostly produced in the nineteenth century.</description>
     </item>
     
     <item>
