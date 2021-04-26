@@ -6,7 +6,16 @@
     <description>Recent content in Posts on Networking Archives Blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Mon, 19 Apr 2021 00:00:00 +0000</lastBuildDate><atom:link href="https://networkingarchives.github.io/blog/post/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Mon, 26 Apr 2021 00:00:00 +0000</lastBuildDate><atom:link href="https://networkingarchives.github.io/blog/post/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Exploring the State Papers with Word Embeddings</title>
+      <link>https://networkingarchives.github.io/blog/2021/04/26/exploring-the-state-papers-with-word-embeddings/</link>
+      <pubDate>Mon, 26 Apr 2021 00:00:00 +0000</pubDate>
+      
+      <guid>https://networkingarchives.github.io/blog/2021/04/26/exploring-the-state-papers-with-word-embeddings/</guid>
+      <description>Text and Models Digital Humanities is often concerned with creating models of text: a general name for a kind of representation of text which makes it in some way easier to interpret. TEI-encoded text is an example of a model: we take the raw material of a text document and add elements to it to make it easier to work with and analyse.</description>
+    </item>
+    
     <item>
       <title>Text Mining the State Papers</title>
       <link>https://networkingarchives.github.io/blog/2021/04/19/text-mining/</link>
