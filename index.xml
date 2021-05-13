@@ -6,7 +6,16 @@
     <description>Recent content on Networking Archives Blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Mon, 26 Apr 2021 00:00:00 +0000</lastBuildDate><atom:link href="https://networkingarchives.github.io/blog/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Thu, 13 May 2021 00:00:00 +0000</lastBuildDate><atom:link href="https://networkingarchives.github.io/blog/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Co-Citation Networks from Letter Mentions: A Short Guide</title>
+      <link>https://networkingarchives.github.io/blog/2021/05/13/co-citation-networks-from-letter-mentions-a-short-guide/</link>
+      <pubDate>Thu, 13 May 2021 00:00:00 +0000</pubDate>
+      
+      <guid>https://networkingarchives.github.io/blog/2021/05/13/co-citation-networks-from-letter-mentions-a-short-guide/</guid>
+      <description>Figure 1: Community Detection in a large academic co-citation network. A link is drawn (as a grey line) between two authors (as coloured circles) if they are both cited in the same paper. Data from: https://www.aminer.cn/citation  This is an R Notebook: a document containing code and text. The source code is available in a GitHub repository. Download the folder and then open it with R-Studio to run the notebook yourself.</description>
+    </item>
+    
     <item>
       <title>Exploring the State Papers with Word Embeddings</title>
       <link>https://networkingarchives.github.io/blog/2021/04/26/exploring-the-state-papers-with-word-embeddings/</link>
@@ -45,10 +54,10 @@
     
     <item>
       <title>Women in the State Papers Online - Through the Data</title>
-      <link>https://networkingarchives.github.io/blog/archive/women-in-the-state-papers-online-through-the-data/</link>
+      <link>https://networkingarchives.github.io/blog/2021/04/15/women-in-the-state-papers-online-through-the-data/</link>
       <pubDate>Thu, 15 Apr 2021 00:00:00 +0000</pubDate>
       
-      <guid>https://networkingarchives.github.io/blog/archive/women-in-the-state-papers-online-through-the-data/</guid>
+      <guid>https://networkingarchives.github.io/blog/2021/04/15/women-in-the-state-papers-online-through-the-data/</guid>
       <description>You can’t search for women in the State Papers Online. There’s no way of knowing how many letters they wrote, or received, or how often they were mentioned. If you know the name you’re looking for you can search through the descriptions and abstracts, but you would need to watch out for spelling variants or mistakes. This method also doesn’t help estimate how many letters there are overall, and it limits the possibility of the chance discovery of women’s writing in the archive.</description>
     </item>
     

@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="generator" content="Hugo 0.82.0" />
+
+
+<title>Co-Citation Networks from Letter Mentions: A Short Guide - Networking Archives Blog</title>
+<meta property="og:title" content="Co-Citation Networks from Letter Mentions: A Short Guide - Networking Archives Blog">
+
+
+  <link href='https://networkingarchives.github.io/blog/favicon.ico' rel='icon' type='image/x-icon'/>
+
+
+
+  
+
+
+
+
+
+
+
+
+<link href='//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css' rel='stylesheet' type='text/css' />
+
+
+
+<link rel="stylesheet" href="/blog/css/fonts.css" media="all">
+<link rel="stylesheet" href="/blog/css/main.css" media="all">
+
+<p>Networking Archives Blog</p>
+
+  </head>
+  <body>
+    <div class="wrapper">
+      <header class="header">
+        <nav class="nav">
+  <a href="/blog/" class="nav-logo">
+    <img src="/blog/images/logo.png"
+         width="50"
+         height="50"
+         alt="Logo">
+  </a>
+
+  <ul class="nav-links">
+    
+    <li><a href="/blog/about/">About</a></li>
+    
+    <li><a href="https://github.com/networkingarchives">GitHub</a></li>
+    
+    <li><a href="https://twitter.com/networkarchives">Twitter</a></li>
+    
+  </ul>
+</nav>
+
+      </header>
+
+
+<main class="content" role="main">
+
+  <article class="article">
+    
+    <span class="article-duration">14 min read</span>
+    
+
+    <h1 class="article-title">Co-Citation Networks from Letter Mentions: A Short Guide</h1>
+
+    
+    <span class="article-date">2021-05-13</span>
+    
+
+    <div class="article-content">
+      
+<script src="https://networkingarchives.github.io/blog/2021/05/13/co-citation-networks-from-letter-mentions-a-short-guide/index_files/header-attrs/header-attrs.js"></script>
+
+
+<div class="figure"><span id="fig:unnamed-chunk-2"></span>
+<img src="https://networkingarchives.github.io/blog/2021/05/13/co-citation-networks-from-letter-mentions-a-short-guide/index_files/figure-html/unnamed-chunk-2-1.png" alt="Community Detection in a large academic co-citation network. A link is drawn (as a grey line) between two authors (as coloured circles) if they are both cited in the same paper. Data from: https://www.aminer.cn/citation" width="672" />
+<p class="caption">
+Figure 1: Community Detection in a large academic co-citation network. A link is drawn (as a grey line) between two authors (as coloured circles) if they are both cited in the same paper. Data from: <a href="https://www.aminer.cn/citation" class="uri">https://www.aminer.cn/citation</a>
+</p>
+</div>
+<hr />
+<p>This is an R Notebook: a document containing code and text. The source code is available in a <a href="https://github.com/networkingarchives/blog_notebooks/r_and_bimodal.Rmd">GitHub repository</a>. Download the folder and then open it with <a href="https://rstudio.com/products/rstudio/">R-Studio</a> to run the notebook yourself.</p>
+<p>You’ll need a little bit of prior knowledge of R and the <a href="https://www.tidyverse.org/">tidyverse</a> to properly follow along, and maybe a basic understanding of the network analysis library <a href="https://igraph.org/r/">igraph</a> and network visualisation library <a href="https://ggraph.data-imaginist.com/">ggraph</a> to do any of your own analysis—if you want to try with your own dataset.</p>
+<p>This post is the fifth in a series documenting some of the code and techniques we’ve been using on the Networking Archives project: you can read the earlier ones <a href="https://networkingarchives.github.io/blog/">here</a></p>
+<p>More info on the Github repository <a href="#info">below</a></p>
+<hr />
+<div id="co-citation-networks-and-historical-correspondence" class="section level2">
+<h2>Co-Citation Networks and Historical Correspondence</h2>
+<p>A co-citation network is a network model which uses the principle that those mentioned (or cited) in the same document may share some kind of link. This kind of work has been widely used to understand, for example, the structure of communities of scholars—based on the principle that if two documents are often cited in the same document, they likely have some kind of semantic link. This is what is drawn in the network diagram above. Here it’s used just as a fancy illustration, but you could use it for analysis: for example, to check to see if the authors in the communities have any shared characteristics, or whether there are distinct communities of scholars or academic areas which repeatedly cite each other. Bipartite networks have also been used to understand <a href="https://www.researchgate.net/publication/228861770_Introducing_the_bipartite_Package_Analysing_Ecological_Networks">ecological food webs</a> - connecting animals which are all prey for the same predator, for example, or flowers pollinated by the same insect.</p>
+<p>The method can also be used to understand other types of citations. One project, <a href="http://www.sixdegreesoffrancisbacon.com/"><em>Six Degrees of Francis Bacon</em></a>, uses co-citation of people in Oxford Dictionary of National Biography articles as a way of inferring some kind of likely social connection - again, based on the premise that if two people were repeatedly mentioned together in articles, they likely share some kind of link. Or, as done here, you could use co-citation to draw links between two individuals, if they are cited, or mentioned, in the same letter.</p>
+<p>This article won’t go into much detail into the theory behind or benefits of co-citation networks. It’s intended as a brief tutorial on gathering data on people mentioned in letters, extracting it into a dataset, and visualising as a co-citation network.</p>
+<p>It’s assuming you’re starting from scratch and either have a dataset of letter metadata (at the very least, a spreadsheet or letters with the names of senders and recipients, but probably with additional metadata such as dates and place of origin), or you intend to make one in which you’ll also record your people mentioned. If you already have people mentioned in some format in your dataset, you’ll need to make sure it fits exactly the format outlined below.</p>
+<p>The tutorial will go through the following steps:</p>
+<ul>
+<li>Collecting and then extracting the data from a simple spreadsheet.</li>
+<li>Creating the <em>bi-modal</em> network (the term will be explained)</li>
+<li><em>Projecting</em> the bi-modal network to unimodal</li>
+<li>Visualising the results.</li>
+</ul>
+<div id="collecting-and-formatting-the-people-mentioned-data" class="section level3">
+<h3>Collecting and formatting the people mentioned data</h3>
+<p>The first step is to read through letters and record the people mentioned in each of the letters. Letter metadata is most often recorded in a simple spreadsheet, with one row per letter, and a separate column for author, recipient, letter origin, and so forth. The easiest way to record people mentioned is in a separate column, with each separated by a semi-colon. There are a number of things to consider:</p>
+<p>Is it possible that you’ll have several people with the same name? If so, you’ll need to come up with some way of distinguishing between them. What’s needed will depend a bit on the size of your dataset. If it is relatively small you could add birth and death dates, if you always have them, to each the people - so two John Smiths become John Smith (1700-1775) and John Smith (1655-1710). If you’re likely to have lots of names and adding dates to distinguish between them would be unwieldy, you could replace each person with a unique numerical code, with a separate ‘lookup table’.</p>
+<p>Do your letters have unique identifiers? You need to identify each letter separately in order to build the co-citation network. If there’s not unique ID, add a simple system of sequential numbers as a first column in your letter dataset. In Excel or Google docs, this can be done just by typing in the first few numbers in a sequence, highlighting those you’ve done, and then clicking the little square in the bottom-right and dragging downwards.</p>
+<p>Are you likely to have the same names occur in the author/recipient and person mentioned fields? If so, it’s important to make sure that people-mentioned names are distinguished from letter-author names (so if you have a John Smith author and a John Smith mentioned, you need to add a unique identifier to each to keep them separate - even if they are actually the same person!). You could, for example, add the word ’_mentioned’ to the end of each name in the person mentioned column.</p>
+<p>For this example, I’ll assume that each name is unique, and that I can easily distinguish between each individual based only on their name. In a ‘real-world’ dataset, this is unlikely and I probably wouldn’t use simply the names.</p>
+<p>Once you’ve decided on the appropriate system, create a new column called ‘people mentioned’ and record each person, followed by a semi-colon. It’s very important that the names used here are consistent - that you always refer to the person with the exact same name or code.</p>
+<p><img src="Screenshot%202021-02-25%20at%2016.27.55.png" /></p>
+<p>Once you’ve done this, import the data into R:</p>
+<p>Load some libraries we’ll use:</p>
+<pre class="r"><code>library(tidyverse)
+library(snakecase)</code></pre>
+<p>Load the sample mentions dataset (if you’ve downloaded the whole Github repo you should have this too). You could also swap in your own if you are confident it’s in the same format.</p>
+<pre class="r"><code>mentions = read_csv(&#39;mentions_example.csv&#39;)</code></pre>
+<div id="making-the-data-long" class="section level4">
+<h4>Making the data ‘long’</h4>
+<p>In order to create the mention network, we need to transform the data. Most importantly, we need to create a table with two columns.</p>
+<ul>
+<li><p>Column 1: the letter ID</p></li>
+<li><p>Column 2: people mentioned</p></li>
+</ul>
+<p><strong>Crucially, instead of all the people mentioned per letter in one cell separated by a semi-colon, each person mentioned will have their own row, with the letter IDs duplicated as needed</strong></p>
+<p>So the first three letter records above would be transformed into the following:</p>
+<p><img src="Screenshot%202021-02-25%20at%2016.35.52.png" width="400" /></p>
+<p>We’ve made the data ‘longer’: see that letter 130, which had five people mentioned, is now transformed into five rows each with one person? This can be done with R and dplyr pretty easily.</p>
+<p>The first step is to put each of the people mentioned in a separate column. For this we need to know the maximum number of columns will need, which can be done by counting the number of semi-colons and taking the maximum value, storing it as a variable called <code>count</code>.</p>
+<pre class="r"><code>count = max(str_count(mentions$people_mentioned, &quot;;&quot;), na.rm = T)
+
+count</code></pre>
+<pre><code>## [1] 7</code></pre>
+<p>Next, use the dplyr verb <code>separate</code> to create a new column for each name separated by a semi-colon. We tell separate to call the columns personmentioned1, personmentioned2, etc. with <code>into = paste0("personmentioned", 1:count), sep = ';')</code> This is where the variable called <code>count</code> comes in: we use it to specify how many columns separate needs to create so it can put each name in a separate one without cutting off the data.</p>
+<pre class="r"><code>people_mentioned_df = mentions %&gt;% 
+  separate(col = people_mentioned,
+           into = paste0(&quot;personmentioned&quot;, 1:count), 
+           sep = &#39;;&#39;)
+
+glimpse(people_mentioned_df)</code></pre>
+<pre><code>## Rows: 19
+## Columns: 10
+## $ letter_id        &lt;chr&gt; &quot;letter_130&quot;, &quot;letter_131&quot;, &quot;letter_132&quot;, &quot;letter_13…
+## $ author           &lt;chr&gt; &quot;Barton, Richard&quot;, &quot;Bassi, Ferdinando&quot;, &quot;Bassi, Ferd…
+## $ recipient        &lt;chr&gt; &quot;Pennant, Thomas&quot;, &quot;Pennant, Thomas&quot;, &quot;Pennant, Thom…
+## $ personmentioned1 &lt;chr&gt; &quot;Brownlow&quot;, &quot;Panton, Thomas&quot;, &quot;Panton, Thomas&quot;, &quot;Pan…
+## $ personmentioned2 &lt;chr&gt; &quot;da Costa&quot;, NA, &quot;Eidelburg&quot;, &quot;da Costa&quot;, &quot;Allion&quot;, &quot;…
+## $ personmentioned3 &lt;chr&gt; &quot;Allion&quot;, NA, NA, NA, &quot;Seguier&quot;, &quot;Ellis, John&quot;, &quot;Bor…
+## $ personmentioned4 &lt;chr&gt; &quot;Caulfeild&quot;, NA, NA, NA, NA, &quot;Pennant (née Falconer)…
+## $ personmentioned5 &lt;chr&gt; &quot;Claws&quot;, NA, NA, NA, NA, NA, &quot;Carburi&quot;, &quot;Willis&quot;, &quot;Z…
+## $ personmentioned6 &lt;chr&gt; NA, NA, NA, NA, NA, NA, &quot;Allion&quot;, NA, &quot;Gualtieri&quot;, N…
+## $ personmentioned7 &lt;chr&gt; NA, NA, NA, NA, NA, NA, &quot;Scilla, Agostino&quot;, NA, &quot;Col…</code></pre>
+<p>This new dataset contains seven new columns, and each separate person mentioned is placed in one. If there are less than seven people mentioned, that column will have a NA value for that letter.</p>
+<p>There’s one more important step before the data is in the format needed. Rather than having the people mentioned in columns running across from left to right, we need one letter column, and one person mentioned column (with letters repeated for multiple people, as above).</p>
+<p>To do this use <code>pivot_longer</code>: another dplyr verb. This takes a selection of columns, and puts them into a ‘long’ format, with one value per row, rather than spread across mutiple columns.</p>
+<ul>
+<li><p><code>names_to</code> and <code>values_to</code> are names given to the new columns. We are going to throw away the names column in this case, so it doesn’t matter what we call it.</p></li>
+<li><p><code>starts_with('personmentioned')</code> is a useful function that will select all the columns that start with a given set of characters - we want it to take all the new columns that start with the words ‘personmentioned’ and put these into the correct format.</p></li>
+</ul>
+<pre class="r"><code>people_mentioned_longer = people_mentioned_df %&gt;% 
+  pivot_longer(names_to = &#39;inst&#39;, 
+               values_to = &#39;person_mentioned&#39;, 
+               starts_with(&#39;personmentioned&#39;))
+
+glimpse(people_mentioned_longer)</code></pre>
+<pre><code>## Rows: 133
+## Columns: 5
+## $ letter_id        &lt;chr&gt; &quot;letter_130&quot;, &quot;letter_130&quot;, &quot;letter_130&quot;, &quot;letter_13…
+## $ author           &lt;chr&gt; &quot;Barton, Richard&quot;, &quot;Barton, Richard&quot;, &quot;Barton, Richa…
+## $ recipient        &lt;chr&gt; &quot;Pennant, Thomas&quot;, &quot;Pennant, Thomas&quot;, &quot;Pennant, Thom…
+## $ inst             &lt;chr&gt; &quot;personmentioned1&quot;, &quot;personmentioned2&quot;, &quot;personmenti…
+## $ person_mentioned &lt;chr&gt; &quot;Brownlow&quot;, &quot;da Costa&quot;, &quot;Allion&quot;, &quot;Caulfeild&quot;, &quot;Claw…</code></pre>
+<p>The last thing to do is to remove any NA values and select only the columns we’re interested in:</p>
+<pre class="r"><code>people_mentioned_longer = people_mentioned_longer %&gt;%
+  filter(!is.na(person_mentioned)) %&gt;% 
+  dplyr::select(letter_id, author, recipient, person_mentioned)</code></pre>
+</div>
+</div>
+<div id="bi-modal-networks" class="section level3">
+<h3>Bi-modal networks</h3>
+<p>At the heart of the co-citation network is a bi-modal or bipartite network. A standard network of correspondents is uni-modal - that is, the connections are between actors of the same type - any node can be a letter author or a letter writer. But networks can be between things of different types - for example, one can draw a network of authors connected to books, or actors to films, and so forth. It’s an established alternative method often used in network science. See, for example, <a href="http://www.scottbot.net/HIAL/index.html@p=38272.html">Scott Weingart’s blog post</a> (and <a href="http://www.scottbot.net/HIAL/index.html@p=39432.html">tutorial</a>) for more detail on this as a technique.</p>
+<p>Even though it seems in this case both are the same type (people), for our purposes they are as different as authors and books. Two ‘people mentioned’ can never be directly connected. The resulting network needs to differentiate between the different types.</p>
+<div id="constructing-a-bi-modal-network-with-igraph" class="section level4">
+<h4>Constructing a Bi-modal network with ``<code>igraph</code>``</h4>
+<p>The first step is to load the igraph library (R’s most useful network analysis toolkit), get each unique combination of letter and person mentioned, and turn into a standard network graph using the igraph function <code>graph_from_data_frame()</code>.</p>
+<pre class="r"><code>library(igraph)
+
+edges = people_mentioned_longer %&gt;% distinct(letter_id, person_mentioned)
+
+g &lt;- graph_from_data_frame(edges, directed = F)</code></pre>
+<p>We can plot it using another package, ``<code>ggraph()</code>``. It shows a network where both types of nodes (people and letters) are directly connected.</p>
+<pre class="r"><code>library(ggraph)
+
+ggraph(g) + 
+  geom_node_point() + 
+  geom_node_text(aes(label = name), size = 2.5)+ 
+  geom_edge_link(alpha = .2) + theme_void()</code></pre>
+<p><img src="https://networkingarchives.github.io/blog/2021/05/13/co-citation-networks-from-letter-mentions-a-short-guide/index_files/figure-html/unnamed-chunk-10-1.png" width="672" /></p>
+<p>What we are interested in is constructing a co-citation network: where links are inferred because of co-mention in the same letter. For this we need to turn the <em>unimodal</em> network into a <em>bimodal</em> one - one where the network software knows that the nodes are of two different types. This is done in igraph by adding a new attribute to the nodes in the network called <code>type</code>, which is either TRUE or FALSE depending on whether the node is from type A (letters) or B (authors).</p>
+<p>It’s easy to do, because we know that if a node name is from column 1, it must be a letter, and if it’s column 2, it must be a person. This <strong>only</strong> works if the names used for both types are unique - if you were constructing a bi-modal network of, say, authors, connected to publishers, if the same person was both an author <em>and</em> a publisher, you’d need to distinguish between the type in the name.</p>
+<p><code>V(g)$name %in% people_mentioned_longer$person_mentioned</code> looks horrible but returns a vector of TRUE or FALSE values, depending on whether or not a name is in the person_mentioned column. <code>V(g)</code> selects the vertices (nodes) in the graph we’ve created, and <code>V(g)$type =</code> creates a new attribute for these vertices and then stores the TRUE/FALSE vector in that attribute.</p>
+<pre class="r"><code>V(g)$type = V(g)$name %in% people_mentioned_longer$person_mentioned</code></pre>
+<p>Now letters and people are distinguished. This can be drawn again using ggraph:</p>
+<pre class="r"><code>ggraph(g) + 
+  geom_node_point(aes(fill = type), size = 4, pch = 21, color = &#39;black&#39;) +
+  geom_node_text(aes(label = name), size = 2, repel = T)+ 
+  geom_edge_link(alpha = .2)+ 
+  theme_void()</code></pre>
+<p><img src="https://networkingarchives.github.io/blog/2021/05/13/co-citation-networks-from-letter-mentions-a-short-guide/index_files/figure-html/unnamed-chunk-12-1.png" width="672" /></p>
+<p>Igraph has a layout specifically for these types of networks called ‘as_bipartite’, which separates out the two types, and tried to cluster them together based on their connections to the other type (though I’m not so sure it is much use here):</p>
+<pre class="r"><code>ggraph(g, &#39;as_bipartite&#39;) + 
+  geom_node_point(aes(fill = type), size = 4, pch = 21, color = &#39;black&#39;) + 
+  geom_node_text(aes(label = name), size = 2, repel = T)+ 
+  geom_edge_link(alpha = .2)+ theme_void()</code></pre>
+<p><img src="https://networkingarchives.github.io/blog/2021/05/13/co-citation-networks-from-letter-mentions-a-short-guide/index_files/figure-html/unnamed-chunk-13-1.png" width="672" /></p>
+</div>
+</div>
+<div id="project-the-bi-modal-network" class="section level3">
+<h3>Project the bi-modal network</h3>
+<p>The final step is the <em>project</em> the network. This is a process of collapsing the bi-modal network into one of its types - with links (or edges) drawn between nodes based on their connection to the other type. A link is drawn if both nodes were connected to the other type.</p>
+<p>The igraph function <code>bipartite_projection()</code> takes care of all this. It will create two new graphs - one where letters are connected if they both mention the same individual (not so useful) and one where people are connected if they are both mentioned in the same letter (more useful). The new graphs are stored as a list: list elements can be accessed using <code>[[1]]</code> or <code>[[2]]</code>.</p>
+<pre class="r"><code>projections = bipartite_projection(g)</code></pre>
+<p>First the letter network:</p>
+<pre class="r"><code>projections[[1]] %&gt;% 
+  ggraph() + 
+  geom_node_point()+ 
+  geom_node_text(aes(label = name))  + 
+  geom_edge_link(alpha = .1) + theme_void()</code></pre>
+<p><img src="https://networkingarchives.github.io/blog/2021/05/13/co-citation-networks-from-letter-mentions-a-short-guide/index_files/figure-html/unnamed-chunk-15-1.png" width="672" /></p>
+<p>In this case, I would struggle to see how the collapsed letter network, with letters connected if the same person is mentioned within them, could be useful. That may not always be true though, depending on the type of document and the specific research question. You could imagine a research question which looked for connections between journal articles based on their citations, for example.</p>
+<p>Next the people, sized by their total connections (degree):</p>
+<pre class="r"><code>V(g)$degree = degree(g)
+
+V(projections[[2]])$degree = degree(projections[[2]])
+projections[[2]] %&gt;% 
+  ggraph() + 
+  geom_node_point(aes(size = degree), size = 4, pch = 21, fill = &#39;lightblue&#39;, color = &#39;black&#39;)+ 
+  geom_node_text(aes(label = name), repel = T, size= 2)  + 
+  geom_edge_link(alpha = .1) + 
+  scale_size_area()+ 
+  theme_void()</code></pre>
+<p><img src="https://networkingarchives.github.io/blog/2021/05/13/co-citation-networks-from-letter-mentions-a-short-guide/index_files/figure-html/unnamed-chunk-16-1.png" width="672" /></p>
+</div>
+</div>
+<div id="what-to-do-with-it" class="section level2">
+<h2>What to do with it?</h2>
+<p>Once you have this projected network, it can be treated as any other network graph. All the same metrics (centrality measures such as degree, community detection, and so forth) can all be calculated as if it was a regular network. Whether you <em>should</em> or not is another question, however. You should think carefully about whether the results are meaningful for your particular dataset- it may be more difficult to interpret centrality in a co-citation network than in a regular one, for example. For one thing, you’re likely to get incredibly dense networks once you project to a unimodal, which makes them hard to directly compare to a regular correspondence network. Scott Weingart discusses these questions in detail in his <a href="http://www.scottbot.net/HIAL/index.html@p=41158.html">blog post</a> on bi-modal networks.</p>
+</div>
+<div id="further-reading" class="section level2">
+<h2>Further reading</h2>
+<p>As mentioned above, <a href="http://www.scottbot.net/HIAL/index.html@p=38272.html">Scott Weingart’s blog post</a> on co-citation (and <a href="http://www.scottbot.net/HIAL/index.html@p=39432.html">tutorial</a>) are an excellent starting-point, as is his blog post on <a href="http://www.scottbot.net/HIAL/index.html@p=41158.html">bi-modal</a> networks.</p>
+<p>Not specifically about co-citation networks, but the recent book <a href="https://doi.org/10.1017/9781108866804">The Network Turn</a> covers networks in detail, specifically relevant to humanities scholars.</p>
+<p>If you want to learn how to do network analysis in R more generally, I recommend Jesse Sadler’s <a href="https://www.jessesadler.com/post/network-analysis-with-r/">blog post</a> as a good starting point.</p>
+<div id="info" class="section level3">
+<h3>More info on this document</h3>
+<p>This document can be run locally using R-Studio, by clicking on the <a href="https://github.com/networkingarchives/blog_notebooks/r_and_bimodal.Rmd">GitHub link</a>. You’ll need to install a few packages first using <code>install.packages</code>:</p>
+<pre><code>tidyverse
+igraph
+ggraph
+tidygraph</code></pre>
+<p>If you want to make the initial co-citation network graph, you’ll need to download <a href="https://lfs.aminer.cn/lab-datasets/citation/citation-network1.zip" class="uri">https://lfs.aminer.cn/lab-datasets/citation/citation-network1.zip</a> and unzip into the same directory as the Github repository. Make sure the file ‘outputacm.txt’ is unzipped and in the folder. It’s not really part of the tutorial so you could just ignore that bit though.</p>
+<p>In theory, it could also be run through<a href="https://mybinder.org/v2/gh/networkingarchives/blog_notebooks/HEAD?urlpath=rstudio">MyBinder</a>, a service which spins up a copy of R-Studio in the cloud and allows you to run any notebook without installing anything yourself, but unfortunately at the moment the sf package seems to be incompatible. It’s worth clicking the link, as perhaps they’ll fix the dependancy in the future (and I’ll update this page if I notice it changes) ` Any questions please feel free to <a href="www.twitter.com/lievesofgrass">tweet me</a>.</p>
+<hr />
+</div>
+</div>
+
+    </div>
+  </article>
+
+  
+
+
+</main>
+
+      <footer class="footer">
+        <ul class="footer-links">
+          <li>
+            <a href="/blog/index.xml" type="application/rss+xml" target="_blank">RSS feed</a>
+          </li>
+          <li>
+            <a href="https://gohugo.io/" class="footer-links-kudos">Made with <img src="/blog/images/hugo-logo.png" alt="Img link to Hugo website" width="22" height="22"></a>
+          </li>
+        </ul>
+      </footer>
+
+    </div>
+    
+
+
+
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+
+
+
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/r.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/yaml.min.js"></script>
+<script>hljs.configure({languages: []}); hljs.initHighlightingOnLoad();</script>
+
+
+
+    
+<script src="/blog/js/math-code.js"></script>
+<script async src="//cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+
+
+    
+  </body>
+</html>
+
