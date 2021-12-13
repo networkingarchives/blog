@@ -81,6 +81,25 @@ Clicking on the MyBinder link above will bring you to an R-Studio instance. In t
     </item>
     
     <item>
+      <title>Networking Archives publication in Computational Humanities Research</title>
+      <link>https://networkingarchives.github.io/blog/2020/11/17/networking-archives-publication-in-computational-humanities-research/</link>
+      <pubDate>Tue, 17 Nov 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://networkingarchives.github.io/blog/2020/11/17/networking-archives-publication-in-computational-humanities-research/</guid>
+      <description>The Networking Archives project is reconciling three separate datasets—Early Modern Letters Online, the Tudor State Papers Online, and Stuart State Papers Online—into one meta-archive. One commonality between the three is that they all, to some degree, contain missing and partial data—potentially a source of anxiety when we come to consider the veracity of our findings. In a recent paper authored by some of the project team, presented at the first Computational Humanities Research Workshop, we outlined some strategies for dealing with missing data, and argued that perhaps we shouldn’t be so worried after all.</description>
+    </item>
+    
+    <item>
+      <title>New Networking Archives Fellows Yann and Philip</title>
+      <link>https://networkingarchives.github.io/blog/2020/05/05/new-networking-archives-fellows-yann-and-philip/</link>
+      <pubDate>Tue, 05 May 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://networkingarchives.github.io/blog/2020/05/05/new-networking-archives-fellows-yann-and-philip/</guid>
+      <description>We are pleased to introduce two new members to the Networking Archives team: Yann Ryan and Philip Beeley. They joined us as Fellows earlier this year, and will be undertaking key parts of the collaborative research projects that we have scoped, including co-authoring the project ‘multigraph’ with the rest of the team, and co-editing the collection of essays coming out of the training schools.
+Yann recently completed a PhD thesis ‘Networks, Maps and Readers: Foreign News Reporting in London Newsbooks, 1645 – 1649’ (QMUL), which looked at the flow of news from overseas to London, and examined how this can be traced and measured using computational techniques (including network analysis) as well as more traditional scholarly methods.</description>
+    </item>
+    
+    <item>
       <title>About</title>
       <link>https://networkingarchives.github.io/blog/about/</link>
       <pubDate>Thu, 05 May 2016 21:48:51 -0700</pubDate>
